@@ -1,0 +1,19 @@
+###Python###
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Inno Setup
+Output
+*.iss
+
+# PyInstaller
+build/
+dist/
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
