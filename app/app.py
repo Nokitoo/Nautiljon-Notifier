@@ -1,5 +1,6 @@
 # Python core libraries
 import sys
+import os
 
 # PyQT5 files
 from PyQt5 import QtCore, QtWidgets
@@ -27,8 +28,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 def main():
     app = QApplication(sys.argv)
+
     main_window = MainWindow()
     main_window.show()
+
+    if __debug__:
+        logger_window = LoggerDialog(main_window)
+        logger_window.move(0, 0)
+        logger_window.setGeometry(0, 0, 500, 200)
+        logger_window.show()
+
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
