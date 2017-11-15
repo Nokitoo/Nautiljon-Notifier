@@ -2,9 +2,16 @@ import requests
 import logging
 from lxml import etree
 from lxml.etree import fromstring
+import time
 
-class User():
+from PyQt5.QtCore import QObject, pyqtSignal
+
+class User(QObject):
+    finished = pyqtSignal(bool)
+    username = ""
+
     def __init__(self):
+        super().__init__()
         logging.debug('qsdqdsqsd')
         self.session = None
         self.session = requests.Session()
@@ -37,9 +44,13 @@ class User():
             # (If there is an error, a 200 response is sent)
             tree = etree.HTML(r.text.encode('utf-8'))
             error = tree.xpath('//div[@id="inscription"]//div[@id="errors"]')
-            return len(error) == 0
+            if len(error) == 0:
+                self.username = username
+                self.finished.emit(True)
+            else:
+                self.finished.emit(False)
 
         except Exception as err:
             logging.debug('Exception thrown')
             logging.debug(err)
-            return False
+            self.finished.emit(False)
