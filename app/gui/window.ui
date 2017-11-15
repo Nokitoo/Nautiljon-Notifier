@@ -131,6 +131,19 @@
      <string>Vous êtes connecté</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="notificationButton">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>130</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Test notification</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -174,8 +187,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>notificationButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onTestNotification()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>267</x>
+     <y>176</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>367</x>
+     <y>191</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onConnect()</slot>
+  <slot>onTestNotification()</slot>
  </slots>
 </ui>

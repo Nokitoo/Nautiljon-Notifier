@@ -6,11 +6,16 @@ from lxml.etree import fromstring
 import time
 import json
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QUrl
+from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
+from PyQt5.QtGui import QIcon, QImage, QPixmap
+
+from config import config
 
 class User(QObject):
     finished = pyqtSignal(bool)
     username = ""
+    avatar = None
     connected = False
     userSaveFilePath = os.path.join(os.path.dirname(__file__), 'user.json')
 
@@ -38,6 +43,7 @@ class User(QObject):
         tree = etree.HTML(req.text.encode('utf-8'))
         registerButton = tree.xpath('//a[@id="btn_insc"]')
         if len(registerButton) == 0:
+            self.retrieveAvatarFromReq(req)
             self.connected = True
 
 
@@ -52,7 +58,7 @@ class User(QObject):
 
         # Make a first call to have session cookies
         # (/membre/login.php won't give us a session cookie)
-        req = self.session.get('https://www.nautiljon.com/')
+        req = self.session.get(config['home_url'])
 
         return req if req.status_code == 200 else None
 
@@ -64,6 +70,21 @@ class User(QObject):
             cookiesStr = json.dumps(cookies)
             logging.debug('Cookies : %s', cookiesStr)
             f.write(cookiesStr)
+
+    def retrieveAvatarFromReq(self, req):
+
+        def imageRetrieved(reply):
+            img = QImage()
+            img.loadFromData(reply.readAll())
+            self.avatar = QIcon(QPixmap(img).scaled(32, 32))
+
+        tree = etree.HTML(req.text.encode('utf-8'))
+        avatarPath = tree.xpath('string(//div[@id="espace_membre"]//img/@src)')
+        if avatarPath:
+            url = config['site_domain'] + avatarPath
+            self.accessManager = QNetworkAccessManager()
+            self.accessManager.finished.connect(imageRetrieved)
+            self.accessManager.get(QNetworkRequest(QUrl(url)))
 
 
     def connect(self, username, password):
@@ -78,16 +99,16 @@ class User(QObject):
                 'login': username,
                 'pass': password,
                 'lcookie': 'on',
-                'r': 'https://www.nautiljon.com/membre/login.php'
+                'r': config['login_url']
             }
-            req = self.session.post('https://www.nautiljon.com/membre/login.php', data=data)
+            req = self.session.post(config['login_url'], data=data)
 
             # Debug
             logging.debug(req.text)
             logging.debug('Status Code : %s', req.status_code)
             logging.debug('Cookies : %s', req.cookies.get_dict())
 
-            # Search for error div
+            # Search for connection error div
             # (If there is an error, a 200 response is sent)
             tree = etree.HTML(req.text.encode('utf-8'))
             error = tree.xpath('//div[@id="inscription"]//div[@id="errors"]')
@@ -95,6 +116,7 @@ class User(QObject):
                 self.username = username
                 self.connected = True
                 self.finished.emit(True)
+                self.retrieveAvatarFromReq(req)
             else:
                 self.finished.emit(False)
 

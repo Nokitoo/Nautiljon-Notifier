@@ -40,15 +40,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.loginForm.setVisible(False)
             self.connectError.setVisible(False)
             self.connectSuccess.setVisible(True)
+            self.notificationButton.setVisible(True)
         else:
             self.loginForm.setVisible(True)
             self.connectSuccess.setVisible(False)
             self.connectError.setVisible(showError)
+            self.notificationButton.setVisible(False)
 
     def cleanUp(self):
         self.workerThread.quit()
         self.workerThread.wait()
         self.user.cleanUp()
+
+    def onTestNotification(self, checked):
+        if self.user.avatar:
+            self.systemtray_icon.showMessage("Titre", "Message", self.user.avatar)
+        else:
+            iconPath = os.path.join(os.path.dirname(__file__), 'assets/nautiljon_icon.ico')
+            self.systemtray_icon.showMessage("Titre", "Message", QIcon(iconPath))
 
     def onConnect(self, checked):
         if self.workerThread.isRunning():
