@@ -25,8 +25,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         iconPath = os.path.join(os.path.dirname(__file__), 'assets/nautiljon_icon.ico')
-        self.systemtray_icon = QSystemTrayIcon(QIcon(iconPath))
+        icon = QIcon(iconPath)
+        self.systemtray_icon = QSystemTrayIcon(icon)
         self.systemtray_icon.show()
+
+        self.setWindowIcon(icon)
 
         self.workerThread = QThread()
         self.user = User()
