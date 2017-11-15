@@ -30,15 +30,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.workerThread = QThread()
         self.user = User()
+        self.user.cleanUp()
         self.user.moveToThread(self.workerThread)
 
-        self.connectError.setVisible(False)
-        self.connectSuccess.setVisible(False)
+        self.displayLoginForm(self.user.connected)
+
+    def displayLoginForm(self, display, showError = False):
+        if display:
+            self.loginForm.setVisible(False)
+            self.connectError.setVisible(False)
+            self.connectSuccess.setVisible(True)
+        else:
+            self.loginForm.setVisible(True)
+            self.connectSuccess.setVisible(False)
+            self.connectError.setVisible(showError)
 
     def cleanUp(self):
         self.workerThread.quit()
         self.workerThread.wait()
-
+        self.user.cleanUp()
 
     def onConnect(self, checked):
         if self.workerThread.isRunning():
@@ -50,14 +60,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         def finishedConnect(success):
             self.workerThread.exit()
-            if success:
-                self.loginForm.setVisible(False)
-                self.connectError.setVisible(False)
-                self.connectSuccess.setVisible(True)
-            else:
-                self.loginForm.setVisible(True)
-                self.connectError.setVisible(True)
-                self.connectSuccess.setVisible(False)
+            self.displayLoginForm(success, True)
+
 
         self.workerThread.quit()
         self.user.finished.connect(finishedConnect)
