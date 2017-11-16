@@ -7,28 +7,38 @@ import time
 import json
 
 from PyQt5.QtCore import QObject, pyqtSignal, QUrl
+from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PyQt5.QtGui import QIcon, QImage, QPixmap
 
 from config import config
+from decorators import autoCreateDir
 
+
+@autoCreateDir(config['data_dir_path'])
 class User(QObject):
     finished = pyqtSignal(bool)
     username = ""
     avatar = None
     connected = False
-    userSaveFilePath = os.path.join(os.path.dirname(__file__), 'user.json')
+    userSaveFilePath = os.path.join(config['data_dir_path'], 'user.json')
 
     def __init__(self):
         super().__init__()
 
+    # Don't init in construtor because we need logs
+    def init(self):
         # Load user cookies from file
         cookies = None
         if os.path.exists(self.userSaveFilePath):
             logging.debug('Loading cookies')
-            with open(self.userSaveFilePath, 'r+') as f:
-                cookies = requests.utils.cookiejar_from_dict(json.loads(f.read()))
-
+            try:
+                with open(self.userSaveFilePath, 'r+') as f:
+                    cookiesStr = f.read()
+                    logging.debug('Cookies : %s', cookiesStr)
+                    cookies = requests.utils.cookiejar_from_dict(json.loads(cookiesStr))
+            except IOError as err:
+                logging.error('Failed to load cookies %s', str(err))
 
         req = self.initSession(cookies)
         # Fail to get page (Invalid session ?)
@@ -43,6 +53,7 @@ class User(QObject):
         tree = etree.HTML(req.text.encode('utf-8'))
         registerButton = tree.xpath('//a[@id="btn_insc"]')
         if len(registerButton) == 0:
+            logging.debug('User is connected')
             self.retrieveAvatarFromReq(req)
             self.connected = True
 
@@ -104,7 +115,6 @@ class User(QObject):
             req = self.session.post(config['login_url'], data=data)
 
             # Debug
-            logging.debug(req.text)
             logging.debug('Status Code : %s', req.status_code)
             logging.debug('Cookies : %s', req.cookies.get_dict())
 
@@ -121,6 +131,5 @@ class User(QObject):
                 self.finished.emit(False)
 
         except Exception as err:
-            logging.debug('Exception thrown')
-            logging.debug(err)
+            logging.debug('Exception thrown : %s', err)
             self.finished.emit(False)

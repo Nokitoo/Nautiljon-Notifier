@@ -33,10 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.workerThread = QThread()
         self.user = User()
-        self.user.cleanUp()
         self.user.moveToThread(self.workerThread)
-
-        self.displayLoginForm(self.user.connected)
 
     def displayLoginForm(self, display, showError = False):
         if display:
@@ -74,7 +71,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.workerThread.exit()
             self.displayLoginForm(success, True)
 
-
         self.workerThread.quit()
         self.user.finished.connect(finishedConnect)
         self.workerThread.started.connect(partial(self.user.connect, username, password))
@@ -84,13 +80,17 @@ def main():
     app = QApplication(sys.argv)
 
     main_window = MainWindow()
-    main_window.show()
 
     if __debug__:
         logger_window = LoggerDialog(main_window)
         logger_window.move(0, 0)
         logger_window.setGeometry(0, 0, 1000, 300)
         logger_window.show()
+
+    main_window.user.init()
+    main_window.displayLoginForm(main_window.user.connected)
+    main_window.show()
+
 
     ret = app.exec_()
     main_window.cleanUp()

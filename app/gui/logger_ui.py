@@ -1,10 +1,17 @@
 # Python core libraries
+import os
+from os.path import expanduser
+import requests
 import logging
 
 # PyQT5 files
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QDialog, QPlainTextEdit, QPushButton, QVBoxLayout
 from PyQt5.QtCore import QObject, pyqtSignal
+
+from config import config
+from decorators import autoCreateDir
+
 
 class LoggerHandler(QObject, logging.Handler):
     log = pyqtSignal(logging.Handler, logging.LogRecord)
@@ -16,29 +23,36 @@ class LoggerHandler(QObject, logging.Handler):
 
     # Emit is called when a log function is called (Ex: logging.debug)
     def emit(self, record):
-        # Send log to UI thread
+        # Send log to LoggerDialog (Because we can log from non-UI thread)
         self.log.emit(self, record)
 
 class LoggerDialog(QDialog):
+    @autoCreateDir(config['data_dir_path'])
     def __init__(self, parent=None):
         super().__init__(parent)
 
         # Create logger handler
-        logTextBox = LoggerHandler(self)
-        logTextBox.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        textBoxHandler = LoggerHandler(self)
+        textBoxHandler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+
+        # Create file handler
+        fileHandler = logging.FileHandler(os.path.join(config['data_dir_path'], "logs.txt"))
+        fileHandler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 
         # Add the log received from LoggerHandler.emit
         def addLogToBox(logger, record):
             msg = logger.format(record)
             self.widget.appendPlainText(msg)
 
-        logTextBox.log.connect(addLogToBox)
+        # Connect text box handler to UI
+        textBoxHandler.log.connect(addLogToBox)
 
-        # Add logger handler to python handlers
-        logging.getLogger().addHandler(logTextBox)
+        # Add logger handlers (text box + file)
+        logging.getLogger().addHandler(textBoxHandler)
+        logging.getLogger().addHandler(fileHandler)
         logging.getLogger().setLevel(logging.DEBUG)
 
-        # Add logger box to layout
+        # Add logger text box to layout
         layout = QVBoxLayout()
         self.widget = QPlainTextEdit(parent)
         layout.addWidget(self.widget)
