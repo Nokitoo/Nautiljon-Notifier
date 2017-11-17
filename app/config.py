@@ -1,7 +1,7 @@
 import os
 
 site_domain = "https://www.nautiljon.com"
-home_url = site_domain + "/"
+home_url = site_domain
 login_url = site_domain + "/membre/login.php"
 
 # expanduser give a cross-platform home directory

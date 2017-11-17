@@ -18,6 +18,8 @@ from decorators import autoCreateDir
 @autoCreateDir(config['data_dir_path'])
 class User(QObject):
     finished = pyqtSignal(bool)
+    retrievedAvatarSignal = pyqtSignal(requests.Response)
+
     username = ""
     avatar = None
     connected = False
@@ -25,6 +27,7 @@ class User(QObject):
 
     def __init__(self):
         super().__init__()
+        self.retrievedAvatarSignal.connect(self.retrieveAvatarFromReq)
 
     # Don't init in construtor because we need logs
     def init(self):
@@ -54,7 +57,7 @@ class User(QObject):
         registerButton = tree.xpath('//a[@id="btn_insc"]')
         if len(registerButton) == 0:
             logging.debug('User is connected')
-            self.retrieveAvatarFromReq(req)
+            self.retrievedAvatarSignal.signal(req)
             self.connected = True
 
 
@@ -83,8 +86,10 @@ class User(QObject):
             f.write(cookiesStr)
 
     def retrieveAvatarFromReq(self, req):
+        logging.debug('Retrieve user avatar')
 
         def imageRetrieved(reply):
+            logging.debug('Avatar retrieved')
             img = QImage()
             img.loadFromData(reply.readAll())
             self.avatar = QIcon(QPixmap(img).scaled(32, 32))
@@ -93,6 +98,7 @@ class User(QObject):
         avatarPath = tree.xpath('string(//div[@id="espace_membre"]//img/@src)')
         if avatarPath:
             url = config['site_domain'] + avatarPath
+            logging.debug('Avatar url : %s', url)
             self.accessManager = QNetworkAccessManager()
             self.accessManager.finished.connect(imageRetrieved)
             self.accessManager.get(QNetworkRequest(QUrl(url)))
@@ -126,7 +132,7 @@ class User(QObject):
                 self.username = username
                 self.connected = True
                 self.finished.emit(True)
-                self.retrieveAvatarFromReq(req)
+                self.retrievedAvatarSignal.emit(req)
             else:
                 self.finished.emit(False)
 
