@@ -185,7 +185,6 @@ class User(QObject):
             logging.debug('Cookies : %s', req.cookies.get_dict())
 
             # Search for connection error div
-            # (If there is an error, a 200 response is sent)
             tree = etree.HTML(req.text.encode('utf-8'))
             error = tree.xpath('//div[@id="inscription"]//div[@id="errors"]')
             if len(error) == 0:

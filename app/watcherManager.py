@@ -15,6 +15,9 @@ class WatcherManager(QObject):
         # Store watchers by url
         self.watchers = {}
 
+        # sent items ids mapped with the watcher name
+        self.sentItemsIds = {}
+
     # A new watcher is a dict with the following fields:
     # - name : watcher name, used to store items ids
     # - url : where are the items to search
@@ -46,14 +49,33 @@ class WatcherManager(QObject):
             logging.debug('Watching url %s', watcherUrl)
             for watcher in self.watchers[watcherUrl]:
                 try:
+                    # Get items page
                     req = user.session.get(watcherUrl)
+
+                    # Parse items
                     tree = etree.HTML(req.text.encode('utf-8'))
                     newItems = tree.xpath(watcher['newItemsXPath'])
                     logging.debug('Found new notifications : %s', newItems)
+
+                    # Init items id array
+                    itemsIdsKey = watcher['name'] + '_ids'
+                    if not hasattr(self.sentItemsIds, itemsIdsKey):
+                        self.sentItemsIds[itemsIdsKey] = []
+                    itemsIds = []
+
                     for item in newItems:
+                        # Retrieve items data
                         itemData = watcher['onNewItem'](item)
                         logging.debug(itemData)
-                        self.imagesLoader.loadImage(itemData)
+
+                        # Only send if not already sent
+                        if itemData['itemId'] not in self.sentItemsIds[itemsIdsKey]:
+                            self.imagesLoader.loadImage(itemData)
+                            itemsIds.append(itemData['itemId'])
+
+                    # Set items ids as sent
+                    self.sentItemsIds[itemsIdsKey] = itemsIds
+
                 except Exception as e:
                     logging.error('Watcher failed for url %s : %s', watcherUrl, e)
 
