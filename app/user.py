@@ -57,7 +57,7 @@ class User(QObject):
         registerButton = tree.xpath('//a[@id="btn_insc"]')
         if len(registerButton) == 0:
             logging.debug('User is connected')
-            self.retrievedAvatarSignal.signal(req)
+            self.retrievedAvatarSignal.emit(req)
             self.connected = True
 
 
