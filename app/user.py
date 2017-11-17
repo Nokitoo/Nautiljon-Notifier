@@ -5,7 +5,7 @@ from lxml import etree
 import time
 import json
 
-from PyQt5.QtCore import QObject, pyqtSignal, QUrl
+from PyQt5.QtCore import QObject, pyqtSignal, QUrl, QThread
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PyQt5.QtGui import QIcon, QImage, QPixmap
@@ -19,6 +19,7 @@ import urllib.parse as urlparse
 @autoCreateDir(config['data_dir_path'])
 class User(QObject):
     finished = pyqtSignal(bool)
+    watchNotifications = pyqtSignal(QObject)
     retrievedAvatarSignal = pyqtSignal(requests.Response)
 
     username = ""
@@ -32,6 +33,19 @@ class User(QObject):
 
     # Don't init in construtor because we need logs
     def init(self, displayNotification):
+        # Init watcher manager and watchers
+        self.watcherManager = WatcherManager(60)
+        self.watcherManager.onNewNotification.connect(displayNotification)
+        self.initWatchers()
+
+        # Setup thread for watcher manager
+        # TODO: Add mutex for resources access
+        self.workerThread = QThread()
+        self.watcherManager.moveToThread(self.workerThread)
+        self.workerThread.start()
+        # We need to use a signal to call watcherManager.watchNotification or it won't be in thead context
+        self.watchNotifications.connect(self.watcherManager.watchNotifications)
+
         # Load user cookies from file
         cookies = None
         if os.path.exists(self.userSaveFilePath):
@@ -53,6 +67,8 @@ class User(QObject):
             if not req:
                 return;
 
+        self.watchNotifications.emit(self)
+
         # Search for register button to know if the user is connected
         tree = etree.HTML(req.text.encode('utf-8'))
         registerButton = tree.xpath('//a[@id="btn_insc"]')
@@ -61,10 +77,8 @@ class User(QObject):
             self.retrievedAvatarSignal.emit(req)
             self.connected = True
 
-        self.initWatchers(displayNotification)
 
-    def initWatchers(self, displayNotification):
-        self.watcherManager = WatcherManager(60)
+    def initWatchers(self):
 
         def getUrlParam(url, param):
             parsed = urlparse.urlparse(url)
@@ -103,9 +117,6 @@ class User(QObject):
         notificationsWatcher['onNewItem'] = onNewNotification
 
         self.watcherManager.addWatcher(notificationsWatcher)
-        self.watcherManager.onNewNotification.connect(displayNotification)
-
-        self.watcherManager.run(self.session)
 
     def initSession(self, cookies = None):
         # Init session
@@ -130,6 +141,9 @@ class User(QObject):
             cookiesStr = json.dumps(cookies)
             logging.debug('Cookies : %s', cookiesStr)
             f.write(cookiesStr)
+
+        self.workerThread.quit()
+        self.workerThread.wait()
 
     def retrieveAvatarFromReq(self, req):
         logging.debug('Retrieve user avatar')
@@ -179,6 +193,7 @@ class User(QObject):
                 self.connected = True
                 self.finished.emit(True)
                 self.retrievedAvatarSignal.emit(req)
+                self.watchNotifications.emit(self)
             else:
                 self.finished.emit(False)
 

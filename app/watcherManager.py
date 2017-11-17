@@ -1,8 +1,8 @@
 import logging
 from lxml import etree
-from PyQt5.QtCore import QObject, pyqtSignal, QUrl
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
-from PyQt5.QtGui import QIcon, QImage, QPixmap
+from PyQt5.QtCore import QObject, pyqtSignal
+
+from imagesLoader import ImagesLoader
 
 
 class WatcherManager(QObject):
@@ -16,10 +16,10 @@ class WatcherManager(QObject):
         self.watchers = {}
 
     # A new watcher is a dict with the following fields:
-    # - name : Watcher name, used to store items ids
-    # - url
-    # - onNewItem : callback for each new notification
-    # - newItemsXPath : xpath to search for new notifications ids
+    # - name : watcher name, used to store items ids
+    # - url : where are the items to search
+    # - onNewItem : callback for each new item
+    # - newItemsXPath : xpath to search for new items ids
     def addWatcher(self, watcher):
         # Check for invalid watcher
         if not 'url' in watcher or not 'onNewItem' in watcher:
@@ -31,35 +31,29 @@ class WatcherManager(QObject):
             self.watchers[watcher['url']] = []
         self.watchers[watcher['url']].append(watcher)
 
-    # Send notification to window after loading icon
-    def sendNotification(self, itemData):
-        logging.debug('Retrieve icon %s', itemData['iconUrl'])
+    # Called from imagesLoader when image is loaded
+    def sendNotificationCallback(self, itemData):
+        self.onNewNotification.emit(itemData)
 
-        def imageRetrieved(reply):
-            logging.debug('Image retrieved')
-            img = QImage()
-            img.loadFromData(reply.readAll())
-            itemData['icon'] = QIcon(QPixmap(img).scaled(32, 32))
-            self.onNewNotification.emit(itemData)
+    def watchNotifications(self, user):
+        # Init images loader
+        # We can't create it in __init__ because it should be created
+        # in the same thread we are using it
+        if not hasattr(self, 'imagesLoader'):
+            self.imagesLoader = ImagesLoader(self.sendNotificationCallback)
 
-        # Load icon
-        self.accessManager = QNetworkAccessManager()
-        self.accessManager.finished.connect(imageRetrieved)
-        self.accessManager.get(QNetworkRequest(QUrl(itemData['iconUrl'])))
-
-    def run(self, session):
         for watcherUrl in self.watchers:
             logging.debug('Watching url %s', watcherUrl)
             for watcher in self.watchers[watcherUrl]:
                 try:
-                    req = session.get(watcherUrl)
+                    req = user.session.get(watcherUrl)
                     tree = etree.HTML(req.text.encode('utf-8'))
                     newItems = tree.xpath(watcher['newItemsXPath'])
                     logging.debug('Found new notifications : %s', newItems)
                     for item in newItems:
                         itemData = watcher['onNewItem'](item)
                         logging.debug(itemData)
-                        self.sendNotification(itemData)
+                        self.imagesLoader.loadImage(itemData)
                 except Exception as e:
                     logging.error('Watcher failed for url %s : %s', watcherUrl, e)
 
