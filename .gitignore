@@ -6,13 +6,10 @@ __pycache__/
 
 # Inno Setup
 Output
-*.iss
 
 # PyInstaller
 build/
 dist/
-*.manifest
-*.spec
 
 # Installer logs
 pip-log.txt

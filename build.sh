@@ -7,4 +7,4 @@ if [ "$1" = "debug" ]; then
 else
     # Use -O to set __debug__ to False
     python -O -m PyInstaller scripts/build.spec
-fi  && iscc build.iss
+fi  && iscc scripts/build.iss
