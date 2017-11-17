@@ -14,6 +14,7 @@ from PyQt5.QtGui import QIcon
 from gui.window_ui import Ui_MainWindow
 
 from user import User
+from config import assets
 
 if __debug__:
     from gui.logger_ui import LoggerDialog
@@ -24,8 +25,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         self.setupUi(self)
 
-        iconPath = os.path.join(os.path.dirname(__file__), 'assets/nautiljon_icon.ico')
-        icon = QIcon(iconPath)
+        icon = QIcon(assets['nautiljon_icon'])
         self.systemtray_icon = QSystemTrayIcon(icon)
         self.systemtray_icon.show()
 
@@ -56,8 +56,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.user.avatar:
             self.systemtray_icon.showMessage("Titre", "Message", self.user.avatar)
         else:
-            iconPath = os.path.join(os.path.dirname(__file__), 'assets/nautiljon_icon.ico')
-            self.systemtray_icon.showMessage("Titre", "Message", QIcon(iconPath))
+            self.systemtray_icon.showMessage("Titre", "Message", QIcon(assets['nautiljon_icon']))
 
     def onConnect(self, checked):
         if self.workerThread.isRunning():
