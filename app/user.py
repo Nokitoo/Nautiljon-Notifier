@@ -2,7 +2,6 @@ import os
 import requests
 import logging
 from lxml import etree
-from lxml.etree import fromstring
 import time
 import json
 
@@ -13,6 +12,8 @@ from PyQt5.QtGui import QIcon, QImage, QPixmap
 
 from config import config
 from decorators import autoCreateDir
+from watcherManager import WatcherManager
+import urllib.parse as urlparse
 
 
 @autoCreateDir(config['data_dir_path'])
@@ -30,7 +31,7 @@ class User(QObject):
         self.retrievedAvatarSignal.connect(self.retrieveAvatarFromReq)
 
     # Don't init in construtor because we need logs
-    def init(self):
+    def init(self, displayNotification):
         # Load user cookies from file
         cookies = None
         if os.path.exists(self.userSaveFilePath):
@@ -60,6 +61,51 @@ class User(QObject):
             self.retrievedAvatarSignal.emit(req)
             self.connected = True
 
+        self.initWatchers(displayNotification)
+
+    def initWatchers(self, displayNotification):
+        self.watcherManager = WatcherManager(60)
+
+        def getUrlParam(url, param):
+            parsed = urlparse.urlparse(url)
+            return urlparse.parse_qs(parsed.query)[param]
+
+        def getResourceUrl(url):
+            # '/resource.png' => 'http://www.site/resource.png'
+            if url and url[0] == '/':
+                return config['site_domain'] + url;
+
+            return url;
+
+        def onNewNotification(item):
+            # Note: don't forget the '.' at the beginning of the XPath to search from the notification node
+            # The 'string' function allows to concatenate all the text nodes of the selected node
+            title = item.xpath('string(.//*[contains(@class, "uneNoficiationTitre")]/text())')
+            message = item.xpath('string(.//*[contains(@class, "uneNotificationMessage")])')
+            iconUrl = getResourceUrl(item.xpath('string(.//*[contains(@class, "uneNotificationLien")]/img/@src)'))
+            href = item.xpath('string(.//a[contains(@class, "uneNotificationLien")]/@href)')
+            onClick = item.xpath('string(.//a[contains(@class, "uneNotificationLien")]/@onclick)')
+            notificationId = getUrlParam(href, 'read');
+
+            logging.debug('New notification')
+
+            return {
+                'itemId': notificationId,
+                'title': title,
+                'message': message,
+                'iconUrl': iconUrl
+            }
+
+        notificationsWatcher = {}
+        notificationsWatcher['name'] = 'notificationsWatcher'
+        notificationsWatcher['url'] = config['notifications_url']
+        notificationsWatcher['newItemsXPath'] = '//div[contains(@class, "toread")]'
+        notificationsWatcher['onNewItem'] = onNewNotification
+
+        self.watcherManager.addWatcher(notificationsWatcher)
+        self.watcherManager.onNewNotification.connect(displayNotification)
+
+        self.watcherManager.run(self.session)
 
     def initSession(self, cookies = None):
         # Init session
@@ -136,6 +182,6 @@ class User(QObject):
             else:
                 self.finished.emit(False)
 
-        except Exception as err:
-            logging.debug('Exception thrown : %s', err)
+        except Exception as e:
+            logging.error('Failed to connect : %s', e)
             self.finished.emit(False)

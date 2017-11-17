@@ -26,8 +26,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         icon = QIcon(assets['nautiljon_icon'])
-        self.systemtray_icon = QSystemTrayIcon(icon)
-        self.systemtray_icon.show()
+        self.systemtrayIcon = QSystemTrayIcon(icon)
+        self.systemtrayIcon.show()
 
         self.setWindowIcon(icon)
 
@@ -35,28 +35,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.user = User()
         self.user.moveToThread(self.workerThread)
 
-    def displayLoginForm(self, display, showError = False):
-        if display:
-            self.loginForm.setVisible(False)
-            self.connectError.setVisible(False)
-            self.connectSuccess.setVisible(True)
-            self.notificationButton.setVisible(True)
-        else:
-            self.loginForm.setVisible(True)
-            self.connectSuccess.setVisible(False)
-            self.connectError.setVisible(showError)
-            self.notificationButton.setVisible(False)
-
     def cleanUp(self):
         self.workerThread.quit()
         self.workerThread.wait()
         self.user.cleanUp()
 
-    def onTestNotification(self, checked):
-        if self.user.avatar:
-            self.systemtray_icon.showMessage("Titre", "Message", self.user.avatar)
+    def displayLoginForm(self, display, showError = False):
+        if display:
+            self.loginForm.setVisible(False)
+            self.connectError.setVisible(False)
+            self.connectSuccess.setVisible(True)
         else:
-            self.systemtray_icon.showMessage("Titre", "Message", QIcon(assets['nautiljon_icon']))
+            self.loginForm.setVisible(True)
+            self.connectSuccess.setVisible(False)
+            self.connectError.setVisible(showError)
+
+    def displayNotification(self, notification):
+        logging.debug('Window received notification')
+        self.systemtrayIcon.showMessage(notification['title'], notification['message'], notification['icon'])
 
     def onConnect(self, checked):
         if self.workerThread.isRunning():
@@ -86,7 +82,7 @@ def main():
         logger_window.setGeometry(0, 0, 1000, 300)
         logger_window.show()
 
-    main_window.user.init()
+    main_window.user.init(main_window.displayNotification)
     main_window.displayLoginForm(main_window.user.connected)
     main_window.show()
 

@@ -59,9 +59,6 @@ class Ui_MainWindow(object):
         self.connectSuccess.setGeometry(QtCore.QRect(10, 10, 141, 16))
         self.connectSuccess.setStyleSheet("QLabel { color : green; }")
         self.connectSuccess.setObjectName("connectSuccess")
-        self.notificationButton = QtWidgets.QPushButton(self.centralWidget)
-        self.notificationButton.setGeometry(QtCore.QRect(220, 130, 91, 31))
-        self.notificationButton.setObjectName("notificationButton")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
         self.menuBar.setGeometry(QtCore.QRect(0, 0, 501, 21))
@@ -77,7 +74,6 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.connectButton.clicked.connect(MainWindow.onConnect)
-        self.notificationButton.clicked.connect(MainWindow.onTestNotification)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -88,5 +84,4 @@ class Ui_MainWindow(object):
         self.connectButton.setText(_translate("MainWindow", "Se connecter"))
         self.connectError.setText(_translate("MainWindow", "Mauvais identifiants"))
         self.connectSuccess.setText(_translate("MainWindow", "Vous êtes connecté"))
-        self.notificationButton.setText(_translate("MainWindow", "Test notification"))
 
