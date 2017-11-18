@@ -33,8 +33,8 @@ class User(QObject):
 
     # Don't init in construtor because we need logs
     def init(self, displayNotification):
-        # Init watcher manager and watchers
-        self.watcherManager = WatcherManager(60)
+        # Init watcher manager and watchers with time interval of 1 minute
+        self.watcherManager = WatcherManager(1)
         self.watcherManager.onNewNotification.connect(displayNotification)
         self.initWatchers()
 

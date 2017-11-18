@@ -1,4 +1,5 @@
 import logging
+import time
 from lxml import etree
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -10,7 +11,7 @@ class WatcherManager(QObject):
 
     def __init__(self, watchIntervals):
         super().__init__()
-        # Watch interval in seconds
+        # Watch interval in minutes
         self.watchIntervals = watchIntervals
         # Store watchers by url
         self.watchers = {}
@@ -79,3 +80,5 @@ class WatcherManager(QObject):
                 except Exception as e:
                     logging.error('Watcher failed for url %s : %s', watcherUrl, e)
 
+        time.sleep(self.watchIntervals * 60)
+        self.watchNotifications(user)
