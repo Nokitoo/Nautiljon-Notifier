@@ -1,6 +1,7 @@
 import logging
 import time
 from lxml import etree
+import traceback
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -29,15 +30,10 @@ class WatcherManager(QObject):
     # - onNewItem : callback for each new item
     # - newItemsXPath : xpath to search for new items ids
     def addWatcher(self, watcher):
-        # Check for invalid watcher
-        if not 'url' in watcher or not 'onNewItem' in watcher:
-            logging.warning('Cannot add a watcher with no url or onNewItem callback')
-            return
-
         # Add watcher
-        if watcher['url'] not in self.watchers:
-            self.watchers[watcher['url']] = []
-        self.watchers[watcher['url']].append(watcher)
+        if watcher.url not in self.watchers:
+            self.watchers[watcher.url] = []
+        self.watchers[watcher.url].append(watcher)
 
     # Called from imagesLoader when image is loaded
     def sendNotificationCallback(self, itemData):
@@ -78,18 +74,18 @@ class WatcherManager(QObject):
 
                     # Parse items
                     tree = etree.HTML(req.text.encode('utf-8'))
-                    newItems = tree.xpath(watcher['newItemsXPath'])
+                    newItems = tree.xpath(watcher.newItemsXPath)
                     logging.debug('Found new notifications : %s', newItems)
 
                     # Init items id array
-                    itemsIdsKey = watcher['name'] + '_ids'
+                    itemsIdsKey = watcher.name + '_ids'
                     if not itemsIdsKey in self.sentItemsIds:
                         self.sentItemsIds[itemsIdsKey] = []
                     itemsIds = []
 
                     for item in newItems:
                         # Retrieve items data
-                        itemData = watcher['onNewItem'](item)
+                        itemData = watcher.onNewItem(item)
 
                         # Only send if not already sent
                         if itemData['itemId'] not in self.sentItemsIds[itemsIdsKey]:
@@ -102,3 +98,4 @@ class WatcherManager(QObject):
 
                 except Exception as e:
                     logging.error('Watcher failed for url %s : %s', watcherUrl, e)
+                    logging.error('Callstack : %s', traceback.format_exc())

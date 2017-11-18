@@ -13,7 +13,7 @@ from PyQt5.QtGui import QIcon, QImage, QPixmap
 from config import config
 from decorators import autoCreateDir
 from watcherManager import WatcherManager
-import urllib.parse as urlparse
+from watchers import NotificationsWatcher
 
 
 @autoCreateDir(config['data_dir_path'])
@@ -33,18 +33,7 @@ class User(QObject):
 
     # Don't init in construtor because we need logs
     def init(self, displayNotification):
-        # Init watcher manager and watchers with time interval of 1 minute
-        self.watcherManager = WatcherManager(1)
-        self.watcherManager.onNewNotification.connect(displayNotification)
-        self.initWatchers()
-
-        # Setup thread for watcher manager
-        # TODO: Add mutex for resources access
-        self.workerThread = QThread()
-        self.watcherManager.moveToThread(self.workerThread)
-        self.workerThread.start()
-        # We need to use a signal to call watcherManager.watchNotification or it won't be in thead context
-        self.startWatchNotifications.connect(self.watcherManager.startWatchNotifications)
+        self.initWatchers(displayNotification)
 
         # Load user cookies from file
         cookies = None
@@ -77,42 +66,21 @@ class User(QObject):
             self.startWatchNotifications.emit(self)
 
 
-    def initWatchers(self):
+    def initWatchers(self, displayNotification):
+        # Init watcher manager and watchers with time interval of 1 minute
+        self.watcherManager = WatcherManager(1)
+        self.watcherManager.onNewNotification.connect(displayNotification)
 
-        def getUrlParam(url, param):
-            parsed = urlparse.urlparse(url)
-            return urlparse.parse_qs(parsed.query)[param][0]
+        # Setup thread for watcher manager
+        # TODO: Add mutex for resources access
+        self.workerThread = QThread()
+        self.watcherManager.moveToThread(self.workerThread)
+        self.workerThread.start()
+        # We need to use a signal to call watcherManager.watchNotification or it won't be in thread context
+        self.startWatchNotifications.connect(self.watcherManager.startWatchNotifications)
 
-        def getResourceUrl(url):
-            # '/resource.png' => 'http://www.site/resource.png'
-            if url and url[0] == '/':
-                return config['site_domain'] + url;
-
-            return url;
-
-        def onNewNotification(item):
-            # Note: don't forget the '.' at the beginning of the XPath to search from the notification node
-            # The 'string' function allows to concatenate all the text nodes of the selected node
-            title = item.xpath('string(.//*[contains(@class, "uneNoficiationTitre")]/text())')
-            message = item.xpath('string(.//*[contains(@class, "uneNotificationMessage")])')
-            iconUrl = getResourceUrl(item.xpath('string(.//*[contains(@class, "uneNotificationLien")]/img/@src)'))
-            href = item.xpath('string(.//a[contains(@class, "uneNotificationLien")]/@href)')
-            onClick = item.xpath('string(.//a[contains(@class, "uneNotificationLien")]/@onclick)')
-            notificationId = getUrlParam(href, 'read');
-
-            return {
-                'itemId': notificationId,
-                'title': title,
-                'message': message,
-                'iconUrl': iconUrl
-            }
-
-        notificationsWatcher = {}
-        notificationsWatcher['name'] = 'notificationsWatcher'
-        notificationsWatcher['url'] = config['notifications_url']
-        notificationsWatcher['newItemsXPath'] = '//div[contains(@class, "toread")]'
-        notificationsWatcher['onNewItem'] = onNewNotification
-
+        # Init watchers
+        notificationsWatcher = NotificationsWatcher()
         self.watcherManager.addWatcher(notificationsWatcher)
 
     def initSession(self, cookies = None):
