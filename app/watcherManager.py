@@ -83,22 +83,22 @@ class WatcherManager(QObject):
 
                     # Init items id array
                     itemsIdsKey = watcher['name'] + '_ids'
-                    if not hasattr(self.sentItemsIds, itemsIdsKey):
+                    if not itemsIdsKey in self.sentItemsIds:
                         self.sentItemsIds[itemsIdsKey] = []
                     itemsIds = []
 
                     for item in newItems:
                         # Retrieve items data
                         itemData = watcher['onNewItem'](item)
-                        logging.debug(itemData)
 
                         # Only send if not already sent
                         if itemData['itemId'] not in self.sentItemsIds[itemsIdsKey]:
+                            logging.debug('Not already sent : %s', itemData)
                             self.imagesLoader.loadImage(itemData)
-                            itemsIds.append(itemData['itemId'])
+                        itemsIds.append(itemData['itemId'])
 
                     # Set items ids as sent
-                    self.sentItemsIds[itemsIdsKey] = itemsIds
+                    self.sentItemsIds[itemsIdsKey] = list(itemsIds)
 
                 except Exception as e:
                     logging.error('Watcher failed for url %s : %s', watcherUrl, e)

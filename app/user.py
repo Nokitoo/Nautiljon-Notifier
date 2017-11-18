@@ -81,7 +81,7 @@ class User(QObject):
 
         def getUrlParam(url, param):
             parsed = urlparse.urlparse(url)
-            return urlparse.parse_qs(parsed.query)[param]
+            return urlparse.parse_qs(parsed.query)[param][0]
 
         def getResourceUrl(url):
             # '/resource.png' => 'http://www.site/resource.png'
@@ -99,8 +99,6 @@ class User(QObject):
             href = item.xpath('string(.//a[contains(@class, "uneNotificationLien")]/@href)')
             onClick = item.xpath('string(.//a[contains(@class, "uneNotificationLien")]/@onclick)')
             notificationId = getUrlParam(href, 'read');
-
-            logging.debug('New notification')
 
             return {
                 'itemId': notificationId,
