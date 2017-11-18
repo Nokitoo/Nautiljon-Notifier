@@ -67,8 +67,6 @@ class User(QObject):
             if not req:
                 return;
 
-        self.watchNotifications.emit(self)
-
         # Search for register button to know if the user is connected
         tree = etree.HTML(req.text.encode('utf-8'))
         registerButton = tree.xpath('//a[@id="btn_insc"]')
@@ -76,6 +74,7 @@ class User(QObject):
             logging.debug('User is connected')
             self.retrievedAvatarSignal.emit(req)
             self.connected = True
+            self.watchNotifications.emit(self)
 
 
     def initWatchers(self):
