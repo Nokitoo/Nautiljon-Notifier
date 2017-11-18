@@ -6,7 +6,7 @@ from functools import partial
 
 # PyQT5 files
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGridLayout, QLineEdit, QSystemTrayIcon
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGridLayout, QLineEdit, QSystemTrayIcon, QMenu
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QIcon
 
@@ -21,14 +21,14 @@ if __debug__:
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+    closeWindow = False
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
 
         icon = QIcon(assets['nautiljon_icon'])
-        self.systemtrayIcon = QSystemTrayIcon(icon)
-        self.systemtrayIcon.show()
-
+        self.setupSystemTrayIcon(icon);
         self.setWindowIcon(icon)
 
         self.workerThread = QThread()
@@ -39,6 +39,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.workerThread.quit()
         self.workerThread.wait()
         self.user.cleanUp()
+
+    def closeEvent(self, event):
+        if not self.closeWindow:
+            event.ignore()
+            self.hide()
+
+    def quitActionTriggered(self, checked):
+        self.closeWindow = True
+        self.close()
+
+    def setupSystemTrayIcon(self, icon):
+        self.systemtrayIcon = QSystemTrayIcon(icon)
+        menu = QMenu();
+
+        openAction = menu.addAction('ouvrir');
+        quitAction = menu.addAction('quitter');
+
+        openAction.triggered.connect(self.show);
+        quitAction.triggered.connect(self.quitActionTriggered);
+
+        self.systemtrayIcon.setContextMenu(menu)
+        self.systemtrayIcon.show()
 
     def displayLoginForm(self, display, showError = False):
         if display:
