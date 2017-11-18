@@ -1,6 +1,7 @@
 import logging
 import time
 from lxml import etree
+
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from imagesLoader import ImagesLoader
@@ -8,6 +9,9 @@ from imagesLoader import ImagesLoader
 
 class WatcherManager(QObject):
     onNewNotification = pyqtSignal(dict)
+    isRunning = True
+    # Used to terminate the thread while waiting (safe quit), on app exit
+    isWaiting = False
 
     def __init__(self, watchIntervals):
         super().__init__()
@@ -38,6 +42,25 @@ class WatcherManager(QObject):
     # Called from imagesLoader when image is loaded
     def sendNotificationCallback(self, itemData):
         self.onNewNotification.emit(itemData)
+
+    def startWatchNotifications(self, user):
+        while self.isRunning:
+            start = time.time()
+            self.watchNotifications(user)
+
+            # Calculate wait time in secs
+            # Use max() to prevent elapsedTime from being greater than self.watchIntervals
+            end = time.time()
+            elapsedTime = end - start
+            waitSecs = max(self.watchIntervals * 60 - elapsedTime, 0)
+
+            self.isWaiting = True
+            if self.isRunning:
+                time.sleep(waitSecs)
+            self.isWaiting = False
+
+    def stopWatchNotifications(self):
+        self.isRunning = False
 
     def watchNotifications(self, user):
         # Init images loader
@@ -79,6 +102,3 @@ class WatcherManager(QObject):
 
                 except Exception as e:
                     logging.error('Watcher failed for url %s : %s', watcherUrl, e)
-
-        time.sleep(self.watchIntervals * 60)
-        self.watchNotifications(user)

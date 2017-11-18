@@ -1,44 +1,30 @@
 import logging
+import requests
 
-from PyQt5.QtCore import QUrl
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PyQt5.QtGui import QIcon, QImage, QPixmap
 
+from config import assets
 
-class ImagesLoader(QNetworkAccessManager):
+
+class ImagesLoader():
     def __init__(self, sendNotificationCallback):
         super().__init__()
 
         # Map QNetworkRequest requests with their corresponding itemData
         self.replies = {}
 
-        self.finished.connect(self.imageRetrieved)
-
         # Callback to send notification to window thread
         self.sendNotificationCallback = sendNotificationCallback
 
-    # Image retrieved from QNetworkAccessManager
-    def imageRetrieved(self, reply):
-        if reply not in self.replies:
-            logging.error('Cannot find reply in ImagesLoader.replies')
-            return;
+    def loadImage(self, itemData):
+        logging.debug('Loading image %s', itemData['iconUrl'])
 
-        # Retrieve itemData from replies and delete its key
-        itemData = self.replies[reply]
-        self.replies.pop(reply)
+        req = requests.get(itemData['iconUrl'], stream=True)
 
-        logging.debug('Icon %s retrieved', itemData['iconUrl'])
-
-        # Load image
+        # Create image
         img = QImage()
-        img.loadFromData(reply.readAll())
+        img.loadFromData(req.raw.data)
         itemData['icon'] = QIcon(QPixmap(img).scaled(32, 32))
 
-        # Send notification to window thread
+        # Send callback
         self.sendNotificationCallback(itemData)
-
-    def loadImage(self, itemData):
-        request = QNetworkRequest(QUrl(itemData['iconUrl']))
-        reply = self.get(request)
-
-        self.replies[reply] = itemData

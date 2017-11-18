@@ -19,7 +19,7 @@ import urllib.parse as urlparse
 @autoCreateDir(config['data_dir_path'])
 class User(QObject):
     finished = pyqtSignal(bool)
-    watchNotifications = pyqtSignal(QObject)
+    startWatchNotifications = pyqtSignal(QObject)
     retrievedAvatarSignal = pyqtSignal(requests.Response)
 
     username = ""
@@ -44,7 +44,7 @@ class User(QObject):
         self.watcherManager.moveToThread(self.workerThread)
         self.workerThread.start()
         # We need to use a signal to call watcherManager.watchNotification or it won't be in thead context
-        self.watchNotifications.connect(self.watcherManager.watchNotifications)
+        self.startWatchNotifications.connect(self.watcherManager.startWatchNotifications)
 
         # Load user cookies from file
         cookies = None
@@ -74,7 +74,7 @@ class User(QObject):
             logging.debug('User is connected')
             self.retrievedAvatarSignal.emit(req)
             self.connected = True
-            self.watchNotifications.emit(self)
+            self.startWatchNotifications.emit(self)
 
 
     def initWatchers(self):
@@ -141,6 +141,9 @@ class User(QObject):
             logging.debug('Cookies : %s', cookiesStr)
             f.write(cookiesStr)
 
+        self.watcherManager.stopWatchNotifications()
+        if self.watcherManager.isWaiting:
+            self.workerThread.terminate()
         self.workerThread.quit()
         self.workerThread.wait()
 
@@ -191,7 +194,7 @@ class User(QObject):
                 self.connected = True
                 self.finished.emit(True)
                 self.retrievedAvatarSignal.emit(req)
-                self.watchNotifications.emit(self)
+                self.startWatchNotifications.emit(self)
             else:
                 self.finished.emit(False)
 

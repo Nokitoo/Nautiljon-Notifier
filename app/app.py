@@ -36,14 +36,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.user.moveToThread(self.workerThread)
 
     def cleanUp(self):
+        self.user.cleanUp()
         self.workerThread.quit()
         self.workerThread.wait()
-        self.user.cleanUp()
 
     def closeEvent(self, event):
         if not self.closeWindow:
-            event.ignore()
-            self.hide()
+           event.ignore()
+           self.hide()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
