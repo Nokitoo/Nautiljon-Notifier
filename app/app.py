@@ -41,6 +41,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.workerThread.quit()
         self.workerThread.wait()
 
+        # Hide the system tray icon or the user has to pass his mouse over
+        # the icon so it disappear
+        self.systemTrayIcon.hide()
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
             self.onConnect(True)
