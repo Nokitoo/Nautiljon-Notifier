@@ -1,13 +1,13 @@
 import os
 
-site_domain = "https://www.nautiljon.com"
+site_domain = 'https://www.nautiljon.com'
 home_url = site_domain
-login_url = site_domain + "/membre/login.php"
-notifications_url = site_domain + "/inc/ajax/notifications.php"
+login_url = site_domain + '/membre/login.php'
+notifications_url = site_domain + '/inc/ajax/notifications.php'
 messages_url = site_domain + '/watashi/messagerie/'
 
 # expanduser give a cross-platform home directory
-HOME = os.path.expanduser("~")
+HOME = os.path.expanduser('~')
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 
 config = {
