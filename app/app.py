@@ -6,7 +6,7 @@ from functools import partial
 
 # PyQT5 files
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGridLayout, QLineEdit, QSystemTrayIcon, QMenu
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGridLayout, QLineEdit
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtGui import QIcon
 
@@ -15,6 +15,7 @@ from gui.window_ui import Ui_MainWindow
 
 from user import User
 from config import assets
+from trayIcon import TrayIcon
 
 if __debug__:
     from gui.logger_ui import LoggerDialog
@@ -28,7 +29,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         icon = QIcon(assets['nautiljon_icon'])
-        self.setupSystemTrayIcon(icon);
+        self.systemTrayIcon = TrayIcon(self, icon);
         self.setWindowIcon(icon)
 
         self.workerThread = QThread()
@@ -40,31 +41,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.workerThread.quit()
         self.workerThread.wait()
 
-    def closeEvent(self, event):
-        if not self.closeWindow:
-           event.ignore()
-           self.hide()
-
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
             self.onConnect(True)
 
-    def quitActionTriggered(self, checked):
-        self.closeWindow = True
-        self.close()
-
-    def setupSystemTrayIcon(self, icon):
-        self.systemtrayIcon = QSystemTrayIcon(icon)
-        menu = QMenu();
-
-        openAction = menu.addAction('ouvrir');
-        quitAction = menu.addAction('quitter');
-
-        openAction.triggered.connect(self.show);
-        quitAction.triggered.connect(self.quitActionTriggered);
-
-        self.systemtrayIcon.setContextMenu(menu)
-        self.systemtrayIcon.show()
+    def closeEvent(self, event):
+        # Don't close window if user exit window
+        # Only quit if the "quit" option has been clicked in the system tray icon
+        if not self.closeWindow:
+           event.ignore()
+           self.hide()
 
     def displayLoginForm(self, display, showError = False):
         if display:
@@ -78,7 +64,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def displayNotification(self, notification):
         logging.debug('Window received notification')
-        self.systemtrayIcon.showMessage(notification['title'], notification['message'], notification['icon'])
+        self.systemTrayIcon.showMessage(notification['title'], notification['message'], notification['icon'])
 
     def onConnect(self, checked):
         if self.workerThread.isRunning():
