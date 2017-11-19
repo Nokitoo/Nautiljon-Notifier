@@ -17,14 +17,17 @@ class ImagesLoader():
         self.sendNotificationCallback = sendNotificationCallback
 
     def loadImage(self, itemData):
-        logging.debug('Loading image %s', itemData['iconUrl'])
+        if itemData['iconUrl'] == 'nautiljon_icon.ico':
+            itemData['icon'] = QIcon(assets['nautiljon_icon'])
+        else:
+            logging.debug('Loading image %s', itemData['iconUrl'])
 
-        req = requests.get(itemData['iconUrl'], stream=True)
+            req = requests.get(itemData['iconUrl'], stream=True)
 
-        # Create image
-        img = QImage()
-        img.loadFromData(req.raw.data)
-        itemData['icon'] = QIcon(QPixmap(img).scaled(32, 32))
+            # Create image
+            img = QImage()
+            img.loadFromData(req.raw.data)
+            itemData['icon'] = QIcon(QPixmap(img).scaled(32, 32))
 
         # Send callback
         self.sendNotificationCallback(itemData)

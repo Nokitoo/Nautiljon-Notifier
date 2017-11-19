@@ -87,3 +87,4 @@ class Ui_MainWindow(object):
         self.connectButton.setText(_translate("MainWindow", "Se connecter"))
         self.connectSuccess.setText(_translate("MainWindow", "Vous êtes connecté"))
         self.connectError.setText(_translate("MainWindow", "Mauvais identifiants"))
+

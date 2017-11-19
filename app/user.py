@@ -13,7 +13,7 @@ from PyQt5.QtGui import QIcon, QImage, QPixmap
 from config import config
 from decorators import autoCreateDir
 from watcherManager import WatcherManager
-from watchers import NotificationsWatcher
+from watchers import NotificationsWatcher, MessagesWatcher
 
 
 @autoCreateDir(config['data_dir_path'])
@@ -81,7 +81,9 @@ class User(QObject):
 
         # Init watchers
         notificationsWatcher = NotificationsWatcher()
+        messagesWatcher = MessagesWatcher()
         self.watcherManager.addWatcher(notificationsWatcher)
+        self.watcherManager.addWatcher(messagesWatcher)
 
     def initSession(self, cookies = None):
         # Init session
