@@ -17,18 +17,27 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <widget class="QWidget" name="loginForm" native="true">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>0</y>
+      <x>120</x>
+      <y>90</y>
       <width>251</width>
       <height>91</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
      <property name="labelAlignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="formAlignment">
+      <set>Qt::AlignCenter</set>
      </property>
      <item row="0" column="0">
       <widget class="QLabel" name="usernameLabel">
@@ -87,16 +96,32 @@
      </item>
     </layout>
    </widget>
+   <widget class="QLabel" name="connectSuccess">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>60</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLabel { color : green; }</string>
+    </property>
+    <property name="text">
+     <string>Vous êtes connecté</string>
+    </property>
+   </widget>
    <widget class="QLabel" name="connectError">
     <property name="enabled">
      <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>100</y>
-      <width>251</width>
-      <height>16</height>
+      <x>120</x>
+      <y>180</y>
+      <width>233</width>
+      <height>13</height>
      </rect>
     </property>
     <property name="font">
@@ -113,22 +138,6 @@
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
-    </property>
-   </widget>
-   <widget class="QLabel" name="connectSuccess">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>141</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QLabel { color : green; }</string>
-    </property>
-    <property name="text">
-     <string>Vous êtes connecté</string>
     </property>
    </widget>
   </widget>
