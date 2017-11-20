@@ -18,7 +18,8 @@ class ImagesLoader():
 
     def loadImage(self, itemData):
         if itemData['iconUrl'] == 'nautiljon_icon.ico':
-            itemData['icon'] = QIcon(assets['nautiljon_icon'])
+            icon = QIcon(assets['nautiljon_icon'])
+            itemData['pixmap'] = icon.pixmap(icon.actualSize(QSize(32, 32)));
         else:
             logging.debug('Loading image %s', itemData['iconUrl'])
 
@@ -27,7 +28,7 @@ class ImagesLoader():
             # Create image
             img = QImage()
             img.loadFromData(req.raw.data)
-            itemData['icon'] = QIcon(QPixmap(img).scaled(32, 32))
+            itemData['pixmap'] = QPixmap(img)
 
         # Send callback
         self.sendNotificationCallback(itemData)
