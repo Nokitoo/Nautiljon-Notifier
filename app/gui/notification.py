@@ -1,4 +1,5 @@
 import logging
+import webbrowser
 
 from PyQt5.QtWidgets import QDialog, QApplication
 from PyQt5.QtCore import Qt, QPropertyAnimation, QSize, QTimer
@@ -10,7 +11,7 @@ from config import assets
 class Notification(QDialog, NotificationDialog):
     mainWindow = None
     queue = []
-    isNotificationDisplayed = False
+    notificationDisplayed = None
 
     def __init__(self, parent, timeout):
         super().__init__(parent)
@@ -39,14 +40,17 @@ class Notification(QDialog, NotificationDialog):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
+            webbrowser.open_new_tab(self.url)
+            if self.onClick:
+                self.onClick()
             self.destroyNotification()
 
     def onNotificationDestroyed(self):
-        Notification.isNotificationDisplayed = False
+        Notification.notificationDisplayed = None
         if len(Notification.queue) > 0:
             notification = Notification.queue.pop(0)
             notification.show()
-            Notification.isNotificationDisplayed = True
+            Notification.notificationDisplayed = notification
 
     def destroyNotification(self):
         self.destroy()
@@ -60,7 +64,15 @@ class Notification(QDialog, NotificationDialog):
 
 
     @staticmethod
-    def create(title, message, pixmap, timeout=5000):
+    def cleanUp():
+        for notification in Notification.queue:
+            notification.destroy()
+
+        if Notification.notificationDisplayed:
+            Notification.notificationDisplayed.destroy()
+
+    @staticmethod
+    def create(title, message, pixmap, url, onClick = None, timeout = 5000):
         if not Notification.mainWindow:
             logging.error('Need to set mainwindow before calling Notification.show()')
             return
@@ -68,13 +80,15 @@ class Notification(QDialog, NotificationDialog):
         notification = Notification(Notification.mainWindow, timeout)
         notification.title.setText(title)
         notification.message.setText(message)
+        notification.onClick = onClick
+        notification.url = url
 
         width = pixmap.width();
         height = pixmap.height();
         notification.icon.setPixmap(pixmap.scaled(width, height, Qt.KeepAspectRatio));
 
-        if not Notification.isNotificationDisplayed:
+        if not Notification.notificationDisplayed:
             notification.show()
-            Notification.isNotificationDisplayed = True
+            Notification.notificationDisplayed = notification
         else:
             Notification.queue.append(notification)

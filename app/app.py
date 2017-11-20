@@ -38,6 +38,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.user.moveToThread(self.workerThread)
 
     def cleanUp(self):
+        # Destroy all notifications
+        Notification.cleanUp()
+
         self.user.cleanUp()
         self.workerThread.quit()
         self.workerThread.wait()
@@ -69,7 +72,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def displayNotification(self, notification):
         logging.debug('Window received notification')
-        Notification.create(notification['title'], notification['message'], notification['pixmap'])
+        Notification.create(notification['title'], notification['message'], notification['pixmap'], notification['url'], notification.get('onClick'))
 
     def onConnect(self, checked):
         if self.workerThread.isRunning():

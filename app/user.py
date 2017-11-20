@@ -80,8 +80,8 @@ class User(QObject):
         self.startWatchNotifications.connect(self.watcherManager.startWatchNotifications)
 
         # Init watchers
-        notificationsWatcher = NotificationsWatcher()
-        messagesWatcher = MessagesWatcher()
+        notificationsWatcher = NotificationsWatcher(self)
+        messagesWatcher = MessagesWatcher(self)
         self.watcherManager.addWatcher(notificationsWatcher)
         self.watcherManager.addWatcher(messagesWatcher)
 
