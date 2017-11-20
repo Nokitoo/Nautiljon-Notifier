@@ -2,6 +2,7 @@ import logging
 import requests
 
 from PyQt5.QtGui import QIcon, QImage, QPixmap
+from PyQt5.QtCore import QSize
 
 from config import assets
 
