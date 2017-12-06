@@ -2,11 +2,26 @@ import logging
 import webbrowser
 
 from PyQt5.QtWidgets import QDialog, QApplication
-from PyQt5.QtCore import Qt, QPropertyAnimation, QSize, QTimer
+from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QEvent
 from PyQt5.QtGui import QIcon
 from gui.notification_ui import Ui_Dialog as NotificationDialog
 
 from config import assets
+
+def clickable(widget):
+    class Filter(QObject):
+        clicked = pyqtSignal()
+        def eventFilter(self, obj, event):
+            if obj == widget:
+                if event.type() == QEvent.MouseButtonRelease:
+                    if obj.rect().contains(event.pos()):
+                        self.clicked.emit()
+                    return True
+            return False
+
+    filter = Filter(widget)
+    widget.installEventFilter(filter)
+    return filter.clicked
 
 class Notification(QDialog, NotificationDialog):
     mainWindow = None
@@ -36,10 +51,10 @@ class Notification(QDialog, NotificationDialog):
         )
 
         self.destroyed.connect(self.onNotificationDestroyed)
-
+        clickable(self.closeNotification).connect(self.destroyNotification)
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and not self.closeNotification.underMouse():
             webbrowser.open_new_tab(self.url)
             if self.onClick:
                 self.onClick()

@@ -41,6 +41,10 @@ class Ui_Dialog(object):
         self.message.setWordWrap(True)
         self.message.setObjectName("message")
         self.verticalLayout.addWidget(self.message)
+        self.closeNotification = QtWidgets.QLabel(Dialog)
+        self.closeNotification.setGeometry(QtCore.QRect(340, 0, 16, 16))
+        self.closeNotification.setAlignment(QtCore.Qt.AlignCenter)
+        self.closeNotification.setObjectName("closeNotification")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -50,4 +54,5 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.title.setText(_translate("Dialog", "TextLabel"))
         self.message.setText(_translate("Dialog", "TextLabel"))
+        self.closeNotification.setText(_translate("Dialog", "X"))
 
