@@ -96,7 +96,11 @@ class User(QObject):
 
         # Make a first call to have session cookies
         # (/membre/login.php won't give us a session cookie)
-        req = self.session.get(config['home_url'])
+        try:
+            req = self.session.get(config['home_url'])
+        except Exception as e:
+            logging.error('Failed to init session : %s', e)
+            return False
 
         return req if req.status_code == 200 else None
 
