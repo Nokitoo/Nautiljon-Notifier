@@ -14,7 +14,17 @@ class Ui_Dialog(object):
         Dialog.resize(354, 105)
         Dialog.setWindowOpacity(1.0)
         Dialog.setToolTip("")
-        Dialog.setStyleSheet("*{background-color: white}")
+        Dialog.setStyleSheet("*{\n"
+"    background-color: white;\n"
+"}\n"
+"\n"
+"QDialog {\n"
+"    border: 1px solid black;\n"
+"}\n"
+"\n"
+"#closeNotification {\n"
+"    background-color: transparent;\n"
+"}")
         self.icon = QtWidgets.QLabel(Dialog)
         self.icon.setGeometry(QtCore.QRect(30, 30, 51, 51))
         self.icon.setStyleSheet("")

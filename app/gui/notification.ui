@@ -20,7 +20,17 @@
    <string/>
   </property>
   <property name="styleSheet">
-   <string notr="true">*{background-color: white}</string>
+   <string notr="true">*{
+	background-color: white;
+}
+
+QDialog {
+	border: 1px solid black;
+}
+
+#closeNotification {
+	background-color: transparent;
+}</string>
   </property>
   <widget class="QLabel" name="icon">
    <property name="geometry">
