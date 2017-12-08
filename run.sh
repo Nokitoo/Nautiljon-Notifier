@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-cd scripts; python ./setup.py build_ui; cd ..; python ./app/app.py
+cd scripts; ./setup.py build_ui; cd ..; ./app/app.py

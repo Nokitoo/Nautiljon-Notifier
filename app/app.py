@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Python core libraries
 import sys
 import os
