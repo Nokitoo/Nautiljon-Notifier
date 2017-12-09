@@ -40,6 +40,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.user = User()
         self.user.moveToThread(self.workerThread)
 
+        # Center window
+        screenRect = QApplication.desktop().screenGeometry()
+        self.setGeometry(
+            (screenRect.width() / 2) - (self.width() / 2),
+            (screenRect.height() / 2) - (self.height() / 2),
+            self.width(),
+            self.height()
+        )
+
     def cleanUp(self):
         Notification.cleanUp()
 
