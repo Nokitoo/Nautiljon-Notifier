@@ -114,10 +114,10 @@ class User(QObject):
             f.write(cookiesStr)
 
         self.watcherManager.stopWatchNotifications()
-        if self.watcherManager.isWaiting:
-            self.workerThread.terminate()
-        self.workerThread.quit()
-        self.workerThread.wait()
+
+        if not self.watcherManager.isWaiting:
+            self.workerThread.quit()
+            self.workerThread.wait()
 
     def retrieveAvatarFromReq(self, req):
         logging.debug('Retrieve user avatar')
