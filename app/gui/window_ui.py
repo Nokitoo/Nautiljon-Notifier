@@ -64,8 +64,11 @@ class Ui_MainWindow(object):
         self.connectError.setObjectName("connectError")
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
+        self.menuBar.setEnabled(True)
         self.menuBar.setGeometry(QtCore.QRect(0, 0, 501, 21))
         self.menuBar.setObjectName("menuBar")
+        self.menuFichier = QtWidgets.QMenu(self.menuBar)
+        self.menuFichier.setObjectName("menuFichier")
         MainWindow.setMenuBar(self.menuBar)
         self.mainToolBar = QtWidgets.QToolBar(MainWindow)
         self.mainToolBar.setEnabled(True)
@@ -74,9 +77,14 @@ class Ui_MainWindow(object):
         self.statusBar = QtWidgets.QStatusBar(MainWindow)
         self.statusBar.setObjectName("statusBar")
         MainWindow.setStatusBar(self.statusBar)
+        self.actionQuit = QtWidgets.QAction(MainWindow)
+        self.actionQuit.setObjectName("actionQuit")
+        self.menuFichier.addAction(self.actionQuit)
+        self.menuBar.addAction(self.menuFichier.menuAction())
 
         self.retranslateUi(MainWindow)
         self.connectButton.clicked.connect(MainWindow.onConnect)
+        self.actionQuit.triggered['bool'].connect(MainWindow.onActionQuit)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -87,4 +95,6 @@ class Ui_MainWindow(object):
         self.connectButton.setText(_translate("MainWindow", "Se connecter"))
         self.connectSuccess.setText(_translate("MainWindow", "Vous êtes connecté"))
         self.connectError.setText(_translate("MainWindow", "Mauvais identifiants"))
+        self.menuFichier.setTitle(_translate("MainWindow", "Fichier"))
+        self.actionQuit.setText(_translate("MainWindow", "Quitter"))
 

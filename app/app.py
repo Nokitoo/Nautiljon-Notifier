@@ -64,6 +64,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if event.key() == Qt.Key_Return:
             self.onConnect(True)
 
+    def onActionQuit(self, checked):
+        self.closeWindow = True
+        self.close()
+
     def closeEvent(self, event):
         # Don't close window if user exit window
         # Only quit if the "quit" option has been clicked in the system tray icon

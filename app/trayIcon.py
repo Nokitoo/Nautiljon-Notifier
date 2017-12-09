@@ -12,7 +12,7 @@ class TrayIcon(QSystemTrayIcon):
         quitAction = menu.addAction('quitter');
 
         openAction.triggered.connect(self.window.show);
-        quitAction.triggered.connect(self.quitActionTriggered);
+        quitAction.triggered.connect(self.window.onActionQuit);
 
         self.activated.connect(self.trayIconActivated)
         self.setContextMenu(menu)
@@ -21,7 +21,3 @@ class TrayIcon(QSystemTrayIcon):
     def trayIconActivated(self, reason):
         if reason == QSystemTrayIcon.DoubleClick:
             self.window.show()
-
-    def quitActionTriggered(self, checked):
-        self.window.closeWindow = True
-        self.window.close()
