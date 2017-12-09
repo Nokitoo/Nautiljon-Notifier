@@ -23,13 +23,13 @@ def clickable(widget):
     widget.installEventFilter(filter)
     return filter.clicked
 
+
 class Notification(QDialog, NotificationDialog):
-    mainWindow = None
     queue = []
     notificationDisplayed = None
 
-    def __init__(self, parent, timeout):
-        super().__init__(parent)
+    def __init__(self, timeout):
+        super().__init__()
         self.setupUi(self)
         self.timeout = timeout
 
@@ -38,7 +38,7 @@ class Notification(QDialog, NotificationDialog):
         marginRight = 20.0;
 
         # Notification flags
-        flags = Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Dialog
+        flags = Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool
         self.setWindowFlags(flags)
 
         # Set notification at the bottom right of the screen
@@ -81,18 +81,14 @@ class Notification(QDialog, NotificationDialog):
     @staticmethod
     def cleanUp():
         for notification in Notification.queue:
-            notification.destroy()
+            notification.close()
 
         if Notification.notificationDisplayed:
-            Notification.notificationDisplayed.destroy()
+            Notification.notificationDisplayed.close()
 
     @staticmethod
     def create(title, message, pixmap, url, onClick = None, timeout = 5000):
-        if not Notification.mainWindow:
-            logging.error('Need to set mainwindow before calling Notification.show()')
-            return
-
-        notification = Notification(Notification.mainWindow, timeout)
+        notification = Notification(timeout)
         notification.title.setText(title)
         notification.message.setText(message)
         notification.onClick = onClick

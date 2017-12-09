@@ -8,7 +8,7 @@ from functools import partial
 
 # PyQT5 files
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QGridLayout
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtGui import QIcon
 
@@ -27,8 +27,9 @@ if __debug__:
 class MainWindow(QMainWindow, Ui_MainWindow):
     closeWindow = False
 
-    def __init__(self):
+    def __init__(self, app):
         super(MainWindow, self).__init__()
+        self.app = app
         self.setupUi(self)
 
         icon = QIcon(assets['nautiljon_icon'])
@@ -40,7 +41,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.user.moveToThread(self.workerThread)
 
     def cleanUp(self):
-        # Destroy all notifications
         Notification.cleanUp()
 
         self.user.cleanUp()
@@ -59,8 +59,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Don't close window if user exit window
         # Only quit if the "quit" option has been clicked in the system tray icon
         if not self.closeWindow:
-           event.ignore()
-           self.hide()
+            event.ignore()
+            self.hide()
+        # Close window and quit application
+        else:
+            self.close()
+            self.cleanUp()
+            self.app.quit()
 
     def displayLoginForm(self, display, showError = False):
         if display:
@@ -95,8 +100,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    # Set this option or the app will close
+    # if a notification is closed when the window is hidden
+    app.setQuitOnLastWindowClosed(False)
 
-    main_window = MainWindow()
+    main_window = MainWindow(app)
 
     if __debug__:
         logger_window = LoggerDialog(main_window)
@@ -107,10 +115,8 @@ def main():
     main_window.user.init(main_window.displayNotification)
     main_window.displayLoginForm(main_window.user.connected)
     main_window.show()
-    Notification.mainWindow = main_window
 
     ret = app.exec_()
-    main_window.cleanUp()
     sys.exit(ret)
 
 if __name__ == "__main__":

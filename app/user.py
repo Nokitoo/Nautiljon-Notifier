@@ -115,6 +115,8 @@ class User(QObject):
 
         self.watcherManager.stopWatchNotifications()
 
+        # Wait only if worker is doing job
+        # Otherwise, force exit
         if not self.watcherManager.isWaiting:
             self.workerThread.quit()
             self.workerThread.wait()
