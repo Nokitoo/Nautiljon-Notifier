@@ -5,5 +5,7 @@ class Watcher():
         self.newItemsXPath = newItemsXPath
         self.user = user
 
+        self.enabled = True
+
     def onNewItem(self, item):
         raise Exception('Should be overridden')

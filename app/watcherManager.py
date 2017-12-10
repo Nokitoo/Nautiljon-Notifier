@@ -69,6 +69,9 @@ class WatcherManager(QObject):
             logging.debug('Watching url %s', watcherUrl)
             for watcher in self.watchers[watcherUrl]:
                 try:
+                    if watcher.enabled == False:
+                        continue
+
                     # Get items page
                     req = user.session.get(watcherUrl)
 

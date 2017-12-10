@@ -14,6 +14,7 @@ from config import config
 from decorators import autoCreateDir
 from watcherManager import WatcherManager
 from watchers import NotificationsWatcher, MessagesWatcher
+from userSettings import UserSettings
 
 
 @autoCreateDir(config['data_dir_path'])
@@ -29,23 +30,30 @@ class User(QObject):
 
     def __init__(self):
         super().__init__()
+        self.settings = UserSettings()
         self.retrievedAvatarSignal.connect(self.retrieveAvatarFromReq)
 
     # Don't init in construtor because we need logs
     def init(self, displayNotification):
-        self.initWatchers(displayNotification)
-
-        # Load user cookies from file
+        # Load user session and settings from file
         cookies = None
         if os.path.exists(self.userSaveFilePath):
-            logging.debug('Loading cookies')
+            logging.debug('Reading user file')
             try:
                 with open(self.userSaveFilePath, 'r+') as f:
-                    cookiesStr = f.read()
-                    logging.debug('Cookies : %s', cookiesStr)
-                    cookies = requests.utils.cookiejar_from_dict(json.loads(cookiesStr))
-            except IOError as err:
-                logging.error('Failed to load cookies %s', str(err))
+                    userDataStr = f.read()
+                    logging.debug('User data : %s', userDataStr)
+                    userDataJson = json.loads(userDataStr)
+
+                    # Load settings
+                    self.settings.loadFromJson(userDataJson)
+
+                    # Retrieve sessid cookies
+                    cookies = requests.utils.cookiejar_from_dict(userDataJson['sessid'])
+            except Exception as e:
+                logging.exception('Failed to load cookies')
+
+        self.initWatchers(displayNotification)
 
         req = self.initSession(cookies)
         # Fail to get page (Invalid session ?)
@@ -80,10 +88,16 @@ class User(QObject):
         self.startWatchNotifications.connect(self.watcherManager.startWatchNotifications)
 
         # Init watchers
-        notificationsWatcher = NotificationsWatcher(self)
-        messagesWatcher = MessagesWatcher(self)
-        self.watcherManager.addWatcher(notificationsWatcher)
-        self.watcherManager.addWatcher(messagesWatcher)
+        self.notificationsWatcher = NotificationsWatcher(self)
+        self.messagesWatcher = MessagesWatcher(self)
+        self.watcherManager.addWatcher(self.notificationsWatcher)
+        self.watcherManager.addWatcher(self.messagesWatcher)
+
+        self.updateWatchers()
+
+    def updateWatchers(self):
+        self.notificationsWatcher.enabled = self.settings.notifications;
+        self.messagesWatcher.enabled = self.settings.messages;
 
     def initSession(self, cookies = None):
         # Init session
@@ -104,14 +118,8 @@ class User(QObject):
 
         return req if req.status_code == 200 else None
 
-    # Save cookies to file
     def cleanUp(self):
-        logging.debug('Saving cookies')
-        with open(self.userSaveFilePath, 'w+') as f:
-            cookies = requests.utils.dict_from_cookiejar(self.session.cookies)
-            cookiesStr = json.dumps(cookies)
-            logging.debug('Cookies : %s', cookiesStr)
-            f.write(cookiesStr)
+        self.saveData()
 
         self.watcherManager.stopWatchNotifications()
 
@@ -120,6 +128,20 @@ class User(QObject):
         if not self.watcherManager.isWaiting:
             self.workerThread.quit()
             self.workerThread.wait()
+
+    # Save cookies and settings to file
+    def saveData(self):
+        logging.debug('Saving user data')
+        with open(self.userSaveFilePath, 'w+') as f:
+            userData = {}
+            userData['sessid'] = requests.utils.dict_from_cookiejar(self.session.cookies)
+            userData['settings'] = {}
+            userData['settings']['notifications'] = self.settings.notifications
+            userData['settings']['messages'] = self.settings.messages
+
+            logging.debug('User data : %s', userData)
+
+            f.write(json.dumps(userData))
 
     def retrieveAvatarFromReq(self, req):
         logging.debug('Retrieve user avatar')
