@@ -1,7 +1,8 @@
 # App modules
-PyQt5 == 5.9.1
-lxml == 4.1.1
-requests == 2.18.4
+PyQt5==5.9.1
+lxml==4.1.1
+requests==2.18.4
+tendo==0.2.8
 
 # Build modules
 PyInstaller==3.3
