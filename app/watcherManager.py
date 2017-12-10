@@ -1,7 +1,6 @@
 import logging
 import time
 from lxml import etree
-import traceback
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -100,5 +99,4 @@ class WatcherManager(QObject):
                     self.sentItemsIds[itemsIdsKey] = list(itemsIds)
 
                 except Exception as e:
-                    logging.error('Watcher failed for url %s : %s', watcherUrl, e)
-                    logging.error('Callstack : %s', traceback.format_exc())
+                    logging.exception('Watcher failed for url %s', watcherUrl)

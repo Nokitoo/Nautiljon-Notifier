@@ -113,7 +113,7 @@ class User(QObject):
         try:
             req = self.session.get(config['home_url'])
         except Exception as e:
-            logging.error('Failed to init session : %s', e)
+            logging.exception('Failed to init session')
             return False
 
         return req if req.status_code == 200 else None
@@ -195,5 +195,5 @@ class User(QObject):
                 self.finished.emit(False)
 
         except Exception as e:
-            logging.error('Failed to connect : %s', e)
+            logging.exception('Failed to connect')
             self.finished.emit(False)

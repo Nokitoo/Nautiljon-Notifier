@@ -25,7 +25,7 @@ class NotificationsWatcher(Watcher):
             try:
                 self.user.session.get(getResourceUrl(href))
             except Exception as e:
-                logging.error('Cannot read notification %s : %s', notificationId, e)
+                logging.exception('Cannot read notification %s', notificationId)
 
         return {
             'itemId': notificationId,
