@@ -1,0 +1,8 @@
+# App modules
+PyQt5 == 5.9.1
+lxml == 4.1.1
+requests == 2.18.4
+
+# Build modules
+PyInstaller==3.3
+pyqt-distutils==0.7.3
