@@ -1,12 +1,8 @@
-import logging
 import webbrowser
 
 from PyQt5.QtWidgets import QDialog, QApplication
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QEvent
-from PyQt5.QtGui import QIcon
 from gui.notification_ui import Ui_Dialog as NotificationDialog
-
-from config import assets
 
 def clickable(widget):
     class Filter(QObject):

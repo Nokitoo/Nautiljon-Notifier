@@ -11,9 +11,6 @@ class ImagesLoader():
     def __init__(self, sendNotificationCallback):
         super().__init__()
 
-        # Map QNetworkRequest requests with their corresponding itemData
-        self.replies = {}
-
         # Callback to send notification to window thread
         self.sendNotificationCallback = sendNotificationCallback
 

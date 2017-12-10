@@ -1,12 +1,9 @@
 # Python core libraries
 import os
-from os.path import expanduser
-import requests
 import logging
 
 # PyQT5 files
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtWidgets import QDialog, QPlainTextEdit, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QDialog, QPlainTextEdit, QVBoxLayout
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from config import config

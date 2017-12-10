@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
-from PyQt5.QtCore import Qt
 
 class TrayIcon(QSystemTrayIcon):
     def __init__(self, window, icon):

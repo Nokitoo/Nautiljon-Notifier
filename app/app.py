@@ -2,13 +2,11 @@
 
 # Python core libraries
 import sys
-import os
 import logging
 from functools import partial
 
 # PyQT5 files
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel
+from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtCore import QThread, Qt
 from PyQt5.QtGui import QIcon
 

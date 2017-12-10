@@ -2,11 +2,9 @@ import os
 import requests
 import logging
 from lxml import etree
-import time
 import json
 
 from PyQt5.QtCore import QObject, pyqtSignal, QUrl, QThread
-from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PyQt5.QtGui import QIcon, QImage, QPixmap
 
