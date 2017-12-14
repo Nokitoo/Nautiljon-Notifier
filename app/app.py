@@ -95,7 +95,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def onNewNotification(self, notification):
         logging.debug('Window received notification')
-        Notification.create(notification['title'], notification['message'], notification['pixmap'], notification['url'], notification.get('onClick'))
+        Notification.create(
+            notification['title'],
+            notification['message'],
+            notification['pixmap'],
+            notification['url'],
+            notification.get('onClick'),
+            self.user.settings.notificationsCloseSeconds * 1000
+        )
 
     def onUserDisconnected(self):
         logging.debug('Window received user deconnection')

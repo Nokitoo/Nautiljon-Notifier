@@ -69,9 +69,12 @@ class Notification(QDialog, NotificationDialog):
 
     def show(self):
         super().show()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.destroyNotification)
-        self.timer.start(self.timeout)
+
+        # Don't close notifications if timeout is 0
+        if self.timeout != 0:
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.destroyNotification)
+            self.timer.start(self.timeout)
 
 
     @staticmethod

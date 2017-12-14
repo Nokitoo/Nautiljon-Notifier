@@ -11,11 +11,13 @@ class UserSettings():
         self.startAtBoot = self.settings.contains("Nautiljon Notifier")
         self.notifications = True
         self.messages = True
+        self.notificationsCloseSeconds = 5
 
     def loadFromJson(self, userDataJson):
         logging.debug('Loading user settings')
         try:
             self.notifications = userDataJson['settings']['notifications']
             self.messages = userDataJson['settings']['messages']
+            self.notificationsCloseSeconds = userDataJson['settings']['notifications_close_seconds']
         except Exception as e:
             logging.exception('Failed to load user settings')

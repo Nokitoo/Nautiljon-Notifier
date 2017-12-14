@@ -1,6 +1,7 @@
 import sys
 
 from PyQt5.QtWidgets import QDialog
+from PyQt5.QtGui import QIntValidator
 
 from gui.preferences_ui import Ui_Dialog
 
@@ -13,6 +14,9 @@ class PreferencesDialog(QDialog, Ui_Dialog):
         self.startAtBootCheckbox.setChecked(self.user.settings.startAtBoot)
         self.notificationsCheckbox.setChecked(self.user.settings.notifications)
         self.messagesCheckbox.setChecked(self.user.settings.messages)
+        self.notificationsCloseSeconds.setText(str(self.user.settings.notificationsCloseSeconds))
+
+        self.notificationsCloseSeconds.setValidator(QIntValidator(0, 100, self));
 
     def onSavePreferences(self):
         self.close()
@@ -29,6 +33,7 @@ class PreferencesDialog(QDialog, Ui_Dialog):
         self.user.settings.notifications = self.notificationsCheckbox.isChecked()
         self.user.settings.messages = self.messagesCheckbox.isChecked()
         self.user.settings.startAtBoot = self.startAtBootCheckbox.isChecked()
+        self.user.settings.notificationsCloseSeconds = int(self.notificationsCloseSeconds.text())
 
         if changed:
             self.user.updateWatchers()

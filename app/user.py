@@ -142,6 +142,7 @@ class User(QObject):
             userData['settings'] = {}
             userData['settings']['notifications'] = self.settings.notifications
             userData['settings']['messages'] = self.settings.messages
+            userData['settings']['notifications_close_seconds'] = self.settings.notificationsCloseSeconds
 
             logging.debug('User data : %s', userData)
 
