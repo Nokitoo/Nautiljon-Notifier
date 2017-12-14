@@ -152,6 +152,9 @@ def main():
     sys.exit(ret)
 
 if __name__ == "__main__":
-    # Will sys.exit(-1) if other instance is running
-    instance = singleton.SingleInstance()
+    # Tendo library make the app crash on exit on linux
+    # Only use on windows
+    if sys.platform == 'win32' or sys.platform == 'cygwin':
+        # Will sys.exit(-1) if other instance is running
+        instance = singleton.SingleInstance()
     main()
