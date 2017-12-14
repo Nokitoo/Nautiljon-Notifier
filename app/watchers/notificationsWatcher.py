@@ -7,7 +7,7 @@ from utils import getResourceUrl, getUrlParam
 
 class NotificationsWatcher(Watcher):
     def __init__(self, user):
-        super().__init__('notificationsWatcher', config['notifications_url'], '//div[contains(@class, "toread")]', user)
+        super().__init__(config['notifications_url'], '//div[contains(@class, "toread")]', user)
 
     def onNewItem(self, item):
         # Note: don't forget the '.' at the beginning of the XPath to search from the notification node

@@ -4,7 +4,7 @@ from utils import getResourceUrl, getUrlParam
 
 class MessagesWatcher(Watcher):
     def __init__(self, user):
-        super().__init__('messages_watcher', config['messages_url'], '//table[@id="list_messages"]//tr[td//img[@alt="Nouveau message"]]', user)
+        super().__init__(config['messages_url'], '//table[@id="list_messages"]//tr[td//img[@alt="Nouveau message"]]', user)
 
     def onNewItem(self, item):
         sender = item.xpath('string(.//div[contains(@class, "cropMembre")])')
