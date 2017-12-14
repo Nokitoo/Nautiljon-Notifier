@@ -136,6 +136,7 @@ def main():
     app.setQuitOnLastWindowClosed(False)
 
     main_window = MainWindow(app)
+    main_window.menuBar.setNativeMenuBar(False)
 
     if __debug__:
         logger_window = LoggerDialog(main_window)
