@@ -9,9 +9,9 @@ from imagesLoader import ImagesLoader
 
 class WatcherManager(QObject):
     onNewNotification = pyqtSignal(dict)
-    isRunning = True
     # Used to terminate the thread while waiting (safe quit), on app exit
     isWaiting = False
+    isRunning = False
 
     def __init__(self, watchIntervals):
         super().__init__()
@@ -39,6 +39,10 @@ class WatcherManager(QObject):
         self.onNewNotification.emit(itemData)
 
     def startWatchNotifications(self, user):
+        if self.isRunning:
+            return;
+
+        self.isRunning = True
         while self.isRunning:
             start = time.time()
             self.watchNotifications(user)
