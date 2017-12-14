@@ -5,6 +5,7 @@ from lxml import etree
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from imagesLoader import ImagesLoader
+from config import config
 
 
 class WatcherManager(QObject):
@@ -45,7 +46,11 @@ class WatcherManager(QObject):
         self.isRunning = True
         while self.isRunning:
             start = time.time()
-            self.watchNotifications(user)
+
+            try:
+                self.watchNotifications(user)
+            except Exception as e:
+                logging.exception('Watcher error')
 
             # Calculate wait time in secs
             # Use max() to prevent elapsedTime from being greater than self.watchIntervals
@@ -70,37 +75,39 @@ class WatcherManager(QObject):
 
         for watcherUrl in self.watchers:
             logging.debug('Watching url %s', watcherUrl)
-            for watcher in self.watchers[watcherUrl]:
-                try:
-                    if watcher.enabled == False:
-                        continue
 
-                    # Get items page
-                    req = user.session.get(watcherUrl)
+            hasWatcherEnabled = len([True for watcher in self.watchers[watcherUrl] if watcher.enabled == True]) > 0
+            if hasWatcherEnabled == False:
+                continue
 
-                    # Parse items
-                    tree = etree.HTML(req.text.encode('utf-8'))
-                    newItems = tree.xpath(watcher.newItemsXPath)
-                    logging.debug('Found new notifications : %s', newItems)
+            try:
+                # Get items page
+                req = user.session.get(watcherUrl)
 
-                    # Init items id array
-                    itemsIdsKey = watcher.name + '_ids'
-                    if not itemsIdsKey in self.sentItemsIds:
-                        self.sentItemsIds[itemsIdsKey] = []
-                    itemsIds = []
+                for watcher in self.watchers[watcherUrl]:
+                        # Parse items
+                        tree = etree.HTML(req.text.encode('utf-8'))
+                        newItems = tree.xpath(watcher.newItemsXPath)
+                        logging.debug('New notifications : %s', newItems)
 
-                    for item in newItems:
-                        # Retrieve items data
-                        itemData = watcher.onNewItem(item)
+                        # Init items id array
+                        itemsIdsKey = watcher.name + '_ids'
+                        if not itemsIdsKey in self.sentItemsIds:
+                            self.sentItemsIds[itemsIdsKey] = []
+                        itemsIds = []
 
-                        # Only send if not already sent
-                        if itemData['itemId'] not in self.sentItemsIds[itemsIdsKey]:
-                            logging.debug('Not already sent : %s', itemData)
-                            self.imagesLoader.loadImage(itemData)
-                        itemsIds.append(itemData['itemId'])
+                        for item in newItems:
+                            # Retrieve items data
+                            itemData = watcher.onNewItem(item)
 
-                    # Set items ids as sent
-                    self.sentItemsIds[itemsIdsKey] = list(itemsIds)
+                            # Only send if not already sent
+                            if itemData['itemId'] not in self.sentItemsIds[itemsIdsKey]:
+                                logging.debug('Not already sent : %s', itemData)
+                                self.imagesLoader.loadImage(itemData)
+                            itemsIds.append(itemData['itemId'])
 
-                except Exception as e:
-                    logging.exception('Watcher failed for url %s', watcherUrl)
+                        # Set items ids as sent
+                        self.sentItemsIds[itemsIdsKey] = list(itemsIds)
+
+            except Exception as e:
+                logging.exception('Watcher failed for url %s', watcherUrl)
