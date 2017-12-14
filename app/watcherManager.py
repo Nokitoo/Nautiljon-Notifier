@@ -10,6 +10,7 @@ from config import config
 
 class WatcherManager(QObject):
     onNewNotification = pyqtSignal(dict)
+    onUserDisconnected = pyqtSignal()
     # Used to terminate the thread while waiting (safe quit), on app exit
     isWaiting = False
     isRunning = False
@@ -66,12 +67,29 @@ class WatcherManager(QObject):
     def stopWatchNotifications(self):
         self.isRunning = False
 
+    def isUserStillConnected(self, user):
+        logging.debug('Checking user is still connected')
+
+        try:
+            req = user.session.get(config['home_url'])
+            return user.reqContainsRegisterButton(req)
+        # The user may be connected but the request failed (eg. no internet)
+        # Try again later
+        except Exception as e:
+            logging.exception('Failed to check user connection')
+            return True
+
     def watchNotifications(self, user):
         # Init images loader
         # We can't create it in __init__ because it should be created
         # in the same thread we are using it
         if not hasattr(self, 'imagesLoader'):
             self.imagesLoader = ImagesLoader(self.sendNotificationCallback)
+
+        if not self.isUserStillConnected(user):
+            logging.warn('User disconnected')
+            self.onUserDisconnected.emit()
+            return
 
         for watcherUrl in self.watchers:
             logging.debug('Watching url %s', watcherUrl)

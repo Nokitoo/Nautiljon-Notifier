@@ -93,9 +93,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.connectSuccess.setVisible(False)
             self.connectError.setVisible(showError)
 
-    def displayNotification(self, notification):
+    def onNewNotification(self, notification):
         logging.debug('Window received notification')
         Notification.create(notification['title'], notification['message'], notification['pixmap'], notification['url'], notification.get('onClick'))
+
+    def onUserDisconnected(self):
+        logging.debug('Window received user deconnection')
+
+        self.user.connected = False
+        self.displayLoginForm(False)
+
+        self.systemTrayIcon.showMessage('Nautiljon Notifier', 'Attention, vous n\'êtes plus connecté', QIcon(assets['nautiljon_icon']))
 
     def onConnect(self, checked):
         if self.workerThread.isRunning():
@@ -128,7 +136,7 @@ def main():
         logger_window.setGeometry(0, 0, 1000, 300)
         logger_window.show()
 
-    main_window.user.init(main_window.displayNotification)
+    main_window.user.init(main_window)
     main_window.displayLoginForm(main_window.user.connected)
     main_window.show()
 

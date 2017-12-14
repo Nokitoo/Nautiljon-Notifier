@@ -32,7 +32,7 @@ class User(QObject):
         self.retrievedAvatarSignal.connect(self.retrieveAvatarFromReq)
 
     # Don't init in construtor because we need logs
-    def init(self, displayNotification):
+    def init(self, mainWindow):
         # Load user session and settings from file
         cookies = None
         if os.path.exists(self.userSaveFilePath):
@@ -51,7 +51,7 @@ class User(QObject):
             except Exception as e:
                 logging.exception('Failed to load cookies')
 
-        self.initWatchers(displayNotification)
+        self.initWatchers(mainWindow)
 
         req = self.initSession(cookies)
         # Fail to get page (Invalid session ?)
@@ -62,20 +62,26 @@ class User(QObject):
             if not req:
                 return;
 
-        # Search for register button to know if the user is connected
-        tree = etree.HTML(req.text.encode('utf-8'))
-        registerButton = tree.xpath('//a[@id="btn_insc"]')
-        if len(registerButton) == 0:
+        if self.reqContainsRegisterButton(req):
             logging.debug('User is connected')
             self.retrievedAvatarSignal.emit(req)
             self.connected = True
             self.startWatchNotifications.emit(self)
 
+    def reqContainsRegisterButton(self, req):
+        if not req:
+            return False
 
-    def initWatchers(self, displayNotification):
+        tree = etree.HTML(req.text.encode('utf-8'))
+        registerButton = tree.xpath('//a[@id="btn_insc"]')
+
+        return len(registerButton) == 0
+
+    def initWatchers(self, mainWindow):
         # Init watcher manager and watchers with time interval of 1 minute
         self.watcherManager = WatcherManager(1)
-        self.watcherManager.onNewNotification.connect(displayNotification)
+        self.watcherManager.onNewNotification.connect(mainWindow.onNewNotification)
+        self.watcherManager.onUserDisconnected.connect(mainWindow.onUserDisconnected)
 
         # Setup thread for watcher manager
         # TODO: Add mutex for resources access
@@ -112,7 +118,7 @@ class User(QObject):
             req = self.session.get(config['home_url'])
         except Exception as e:
             logging.exception('Failed to init session')
-            return False
+            return None
 
         return req if req.status_code == 200 else None
 
