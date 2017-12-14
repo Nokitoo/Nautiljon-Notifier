@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Nautiljon Notifier"
-#define MyAppVersion "0.1"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "Nokitoo"
 #define MyAppExeName "Nautiljon Notifier.exe"
 
