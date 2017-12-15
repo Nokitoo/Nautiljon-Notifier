@@ -30,11 +30,11 @@ class LoggerDialog(QDialog):
 
         # Create logger handler
         textBoxHandler = LoggerHandler(self)
-        textBoxHandler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        textBoxHandler.setFormatter(logging.Formatter(u'%(asctime)s - %(levelname)s - %(message)s'))
 
         # Create file handler
         fileHandler = logging.FileHandler(os.path.join(config['data_dir_path'], "logs.txt"))
-        fileHandler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        fileHandler.setFormatter(logging.Formatter(u'%(asctime)s - %(levelname)s - %(message)s'))
 
         # Add the log received from LoggerHandler.emit
         def addLogToBox(logger, record):

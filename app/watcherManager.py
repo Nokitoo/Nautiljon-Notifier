@@ -101,8 +101,10 @@ class WatcherManager(QObject):
 
                 for watcher in self.watchers[watcherUrl]:
                         # Parse items
-                        tree = etree.HTML(req.text.encode('utf-8'))
+                        parser = etree.HTMLParser(encoding="utf-8")
+                        tree = etree.HTML(req.text.encode('utf-8'), parser=parser)
                         newItems = tree.xpath(watcher.newItemsXPath)
+
                         logging.debug('New notifications : %s', newItems)
 
                         itemsIds = []
@@ -112,7 +114,7 @@ class WatcherManager(QObject):
 
                             # Only send if not already sent
                             if itemData['itemId'] not in watcher.sentItemsIds:
-                                logging.debug('Not already sent : %s', itemData)
+                                logging.debug('Not already sent : %s', itemData['itemId'])
                                 self.imagesLoader.loadImage(itemData)
                             itemsIds.append(itemData['itemId'])
 
