@@ -92,7 +92,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Nautiljon notifier"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Nautiljon Notifier"))
         self.usernameLabel.setText(_translate("MainWindow", "Identifiant"))
         self.passwordLabel.setText(_translate("MainWindow", "Mot de passe"))
         self.connectButton.setText(_translate("MainWindow", "Se connecter"))

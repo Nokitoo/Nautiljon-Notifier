@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Nautiljon notifier</string>
+   <string>Nautiljon Notifier</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="enabled">
