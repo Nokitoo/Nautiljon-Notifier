@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(354, 105)
+        Dialog.resize(363, 120)
         Dialog.setWindowOpacity(1.0)
         Dialog.setToolTip("")
         Dialog.setStyleSheet("*{\n"
@@ -26,14 +26,13 @@ class Ui_Dialog(object):
 "    background-color: transparent;\n"
 "}")
         self.icon = QtWidgets.QLabel(Dialog)
-        self.icon.setGeometry(QtCore.QRect(30, 30, 51, 51))
+        self.icon.setGeometry(QtCore.QRect(20, 20, 81, 81))
         self.icon.setStyleSheet("")
         self.icon.setText("")
-        self.icon.setPixmap(QtGui.QPixmap("../assets/nautiljon_icon.png"))
-        self.icon.setScaledContents(True)
+        self.icon.setScaledContents(False)
         self.icon.setObjectName("icon")
         self.verticalLayoutWidget = QtWidgets.QWidget(Dialog)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(110, 10, 231, 81))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(110, 20, 231, 81))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -53,6 +52,9 @@ class Ui_Dialog(object):
         self.verticalLayout.addWidget(self.message)
         self.closeNotification = QtWidgets.QLabel(Dialog)
         self.closeNotification.setGeometry(QtCore.QRect(340, 0, 16, 16))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.closeNotification.setFont(font)
         self.closeNotification.setAlignment(QtCore.Qt.AlignCenter)
         self.closeNotification.setObjectName("closeNotification")
 
@@ -64,5 +66,5 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.title.setText(_translate("Dialog", "TextLabel"))
         self.message.setText(_translate("Dialog", "TextLabel"))
-        self.closeNotification.setText(_translate("Dialog", "X"))
+        self.closeNotification.setText(_translate("Dialog", "x"))
 

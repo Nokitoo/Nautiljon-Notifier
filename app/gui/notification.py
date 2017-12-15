@@ -93,8 +93,13 @@ class Notification(QDialog, NotificationDialog):
         notification.onClick = onClick
         notification.url = url
 
-        width = pixmap.width();
-        height = pixmap.height();
+        labelWidth = notification.icon.width();
+        labelHeight = notification.icon.height();
+        pixmapWidth = pixmap.width()
+        pixmapHeight = pixmap.height()
+        # Use the smallest size to prevent upper scale
+        width = min(labelWidth, pixmapWidth)
+        height = min(labelHeight, pixmapHeight)
         notification.icon.setPixmap(pixmap.scaled(width, height, Qt.KeepAspectRatio));
 
         if not Notification.notificationDisplayed:

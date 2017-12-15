@@ -16,8 +16,8 @@ class ImagesLoader():
 
     def loadImage(self, itemData):
         if itemData['iconUrl'] == 'nautiljon_icon.ico':
-            icon = QIcon(assets['nautiljon_icon'])
-            itemData['pixmap'] = icon.pixmap(icon.actualSize(QSize(32, 32)));
+            icon = QIcon(assets['nautiljon_icon_desktop'])
+            itemData['pixmap'] = icon.pixmap(icon.actualSize(QSize(64, 64)));
         else:
             logging.debug('Loading image %s', itemData['iconUrl'])
 
