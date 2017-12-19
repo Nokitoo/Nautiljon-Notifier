@@ -3,6 +3,7 @@
 # Python core libraries
 import sys
 import logging
+import requests
 from functools import partial
 
 # Librairies files
@@ -83,7 +84,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.cleanUp()
             self.app.quit()
 
-    def displayLoginForm(self, display, showError = False):
+    def displayLoginForm(self, display, errorMessage = None):
         if display:
             self.loginForm.setVisible(False)
             self.connectError.setVisible(False)
@@ -91,7 +92,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.loginForm.setVisible(True)
             self.connectSuccess.setVisible(False)
-            self.connectError.setVisible(showError)
+            self.connectError.setVisible(False)
+
+            if errorMessage:
+                self.connectError.setText(errorMessage)
+                self.connectError.setVisible(True)
 
     def onNewNotification(self, notification):
         logging.debug('Window received notification')
@@ -120,12 +125,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         username = self.usernameInput.text()
         password = self.passwordInput.text()
 
-        def finishedConnect(success):
+        def onFinishedConnect(err, success):
+            errorMessage = None
+            if not success:
+                if err and type(err) == requests.exceptions.ConnectionError:
+                    errorMessage = "Erreur de connexion"
+                else:
+                    errorMessage = "Mauvais identifiants"
+
             self.workerThread.exit()
-            self.displayLoginForm(success, True)
+            self.displayLoginForm(success, errorMessage)
 
         self.workerThread.quit()
-        self.user.finished.connect(finishedConnect)
+        self.user.onFinishedConnect.connect(onFinishedConnect)
         self.workerThread.started.connect(partial(self.user.connect, username, password))
         self.workerThread.start()
 

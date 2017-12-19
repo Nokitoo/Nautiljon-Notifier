@@ -17,7 +17,7 @@ from userSettings import UserSettings
 
 @autoCreateDir(config['data_dir_path'])
 class User(QObject):
-    finished = pyqtSignal(bool)
+    onFinishedConnect = pyqtSignal(object, bool)
     startWatchNotifications = pyqtSignal(QObject)
     retrievedAvatarSignal = pyqtSignal(requests.Response)
 
@@ -193,12 +193,12 @@ class User(QObject):
             if len(error) == 0:
                 self.username = username
                 self.connected = True
-                self.finished.emit(True)
+                self.onFinishedConnect.emit(None, True)
                 self.retrievedAvatarSignal.emit(req)
                 self.startWatchNotifications.emit(self)
             else:
-                self.finished.emit(False)
+                self.onFinishedConnect.emit(None, False)
 
         except Exception as e:
             logging.exception('Failed to connect')
-            self.finished.emit(False)
+            self.onFinishedConnect.emit(e, False)
