@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
         self.formContainer.setFrameShadow(QtWidgets.QFrame.Raised)
         self.formContainer.setObjectName("formContainer")
         self.connectSuccess = QtWidgets.QLabel(self.formContainer)
-        self.connectSuccess.setGeometry(QtCore.QRect(110, 30, 141, 16))
+        self.connectSuccess.setGeometry(QtCore.QRect(130, 90, 151, 21))
         self.connectSuccess.setStyleSheet("QLabel { color : green; }")
         self.connectSuccess.setObjectName("connectSuccess")
         self.loginForm = QtWidgets.QWidget(self.formContainer)
