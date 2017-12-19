@@ -21,5 +21,6 @@ config = {
 
 assets = {
     'nautiljon_icon': os.path.join(APP_DIR, 'assets/nautiljon_icon.ico'),
-    'nautiljon_icon_desktop': os.path.join(APP_DIR, 'assets/nautiljon_icon_desktop.ico')
+    'nautiljon_icon_desktop': os.path.join(APP_DIR, 'assets/nautiljon_icon_desktop.ico'),
+    'loading_spinner': os.path.join(APP_DIR, 'assets/spinner.gif')
 }

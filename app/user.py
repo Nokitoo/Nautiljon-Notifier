@@ -17,7 +17,7 @@ from userSettings import UserSettings
 
 @autoCreateDir(config['data_dir_path'])
 class User(QObject):
-    onFinishedConnect = pyqtSignal(object, bool)
+    onFinishedConnect = pyqtSignal(str, bool)
     startWatchNotifications = pyqtSignal(QObject)
     retrievedAvatarSignal = pyqtSignal(requests.Response)
 
@@ -60,13 +60,17 @@ class User(QObject):
             req = self.initSession()
             # Fail with fresh cookies
             if not req:
+                self.onFinishedConnect.emit(None, False)
                 return;
 
         if self.reqContainsRegisterButton(req):
             logging.debug('User is connected')
             self.retrievedAvatarSignal.emit(req)
             self.connected = True
+            self.onFinishedConnect.emit(None, True)
             self.startWatchNotifications.emit(self)
+        else:
+            self.onFinishedConnect.emit(None, False)
 
     def reqContainsRegisterButton(self, req):
         if not req:
@@ -197,8 +201,8 @@ class User(QObject):
                 self.retrievedAvatarSignal.emit(req)
                 self.startWatchNotifications.emit(self)
             else:
-                self.onFinishedConnect.emit(None, False)
+                self.onFinishedConnect.emit("Mauvais identifiants", False)
 
         except Exception as e:
             logging.exception('Failed to connect')
-            self.onFinishedConnect.emit(e, False)
+            self.onFinishedConnect.emit("Erreur de connexion", False)
