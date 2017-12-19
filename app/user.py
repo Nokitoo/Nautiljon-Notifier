@@ -19,7 +19,6 @@ from userSettings import UserSettings
 class User(QObject):
     onFinishedConnect = pyqtSignal(str, bool)
     startWatchNotifications = pyqtSignal(QObject)
-    retrievedAvatarSignal = pyqtSignal(requests.Response)
 
     username = ""
     avatar = None
@@ -29,7 +28,6 @@ class User(QObject):
     def __init__(self):
         super().__init__()
         self.settings = UserSettings()
-        self.retrievedAvatarSignal.connect(self.retrieveAvatarFromReq)
 
     # Don't init in construtor because we need logs
     def init(self, mainWindow):
@@ -65,7 +63,6 @@ class User(QObject):
 
         if self.reqContainsRegisterButton(req):
             logging.debug('User is connected')
-            self.retrievedAvatarSignal.emit(req)
             self.connected = True
             self.onFinishedConnect.emit(None, True)
             self.startWatchNotifications.emit(self)
@@ -152,25 +149,6 @@ class User(QObject):
 
             f.write(json.dumps(userData))
 
-    def retrieveAvatarFromReq(self, req):
-        logging.debug('Retrieve user avatar')
-
-        def imageRetrieved(reply):
-            logging.debug('Avatar retrieved')
-            img = QImage()
-            img.loadFromData(reply.readAll())
-            self.avatar = QIcon(QPixmap(img).scaled(32, 32))
-
-        tree = etree.HTML(req.text.encode('utf-8'))
-        avatarPath = tree.xpath('string(//div[@id="espace_membre"]//img/@src)')
-        if avatarPath:
-            url = config['site_domain'] + avatarPath
-            logging.debug('Avatar url : %s', url)
-            self.accessManager = QNetworkAccessManager()
-            self.accessManager.finished.connect(imageRetrieved)
-            self.accessManager.get(QNetworkRequest(QUrl(url)))
-
-
     def connect(self, username, password):
         logging.debug('Connecting user...')
         logging.debug('Username : %s', username)
@@ -198,7 +176,6 @@ class User(QObject):
                 self.username = username
                 self.connected = True
                 self.onFinishedConnect.emit(None, True)
-                self.retrievedAvatarSignal.emit(req)
                 self.startWatchNotifications.emit(self)
             else:
                 self.onFinishedConnect.emit("Mauvais identifiants", False)
