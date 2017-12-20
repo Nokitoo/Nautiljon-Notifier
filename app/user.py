@@ -20,7 +20,6 @@ class User(QObject):
     onFinishedConnect = pyqtSignal(str, bool)
     startWatchNotifications = pyqtSignal(QObject)
 
-    username = ""
     avatar = None
     connected = False
     userSaveFilePath = os.path.join(config['data_dir_path'], 'user.json')
@@ -151,8 +150,6 @@ class User(QObject):
 
     def connect(self, username, password):
         logging.debug('Connecting user...')
-        logging.debug('Username : %s', username)
-        logging.debug('Password : %s', password)
 
         # Try to connect
         try:
@@ -173,7 +170,6 @@ class User(QObject):
             tree = etree.HTML(req.text.encode('utf-8'))
             error = tree.xpath('//div[@id="inscription"]//div[@id="errors"]')
             if len(error) == 0:
-                self.username = username
                 self.connected = True
                 self.onFinishedConnect.emit(None, True)
                 self.startWatchNotifications.emit(self)
