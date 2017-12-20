@@ -111,6 +111,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.connectError.hide()
             self.connectSuccess.show()
 
+            # Empty inputs
+            self.usernameInput.setText("")
+            self.passwordInput.setText("")
+
+
     def displaySpinner(self, display):
         if display:
             self.formContainer.hide()
