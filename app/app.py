@@ -99,10 +99,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.displaySpinner(False)
 
         if display:
-            self.loginForm.hide()
-            self.connectError.hide()
-            self.connectSuccess.show()
-        else:
             self.loginForm.show()
             self.connectSuccess.hide()
             self.connectError.hide()
@@ -110,6 +106,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if errorMessage:
                 self.connectError.setText(errorMessage)
                 self.connectError.show()
+        else:
+            self.loginForm.hide()
+            self.connectError.hide()
+            self.connectSuccess.show()
 
     def displaySpinner(self, display):
         if display:
@@ -136,13 +136,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         logging.debug('Window received user deconnection')
 
         self.user.connected = False
-        self.displayLoginForm(False)
+        self.displayLoginForm(True)
 
         self.systemTrayIcon.showMessage('Nautiljon Notifier', 'Attention, vous n\'êtes plus connecté', QIcon(assets['nautiljon_icon']))
 
     def onFinishedConnect(self, errMsg, success):
         self.workerThread.exit()
-        self.displayLoginForm(success, errMsg)
+        self.displayLoginForm(not success, errMsg)
 
     def onConnect(self, checked):
         if self.workerThread.isRunning():
