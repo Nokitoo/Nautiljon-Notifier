@@ -51,6 +51,11 @@
       <height>201</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame {
+	border: 0;
+}</string>
+    </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
     </property>
@@ -174,14 +179,9 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <zorder>connectSuccess</zorder>
-    <zorder>connectSuccess</zorder>
-    <zorder>loginForm</zorder>
-    <zorder>connectError</zorder>
    </widget>
    <zorder>formContainer</zorder>
    <zorder>loadingSpinner</zorder>
-   <zorder>loginForm</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="enabled">

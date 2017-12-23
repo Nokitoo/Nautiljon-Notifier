@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\Nokito\Documents\Nautiljon Notifier PythonQT\scripts\../app/gui\window.ui'
+# Form implementation generated from reading ui file '/home/nokito/Documents/testVirtualEnv/Nautiljon-Notifier/scripts/../app/gui/window.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.1
 #
@@ -24,6 +24,9 @@ class Ui_MainWindow(object):
         self.loadingSpinner.setObjectName("loadingSpinner")
         self.formContainer = QtWidgets.QFrame(self.centralWidget)
         self.formContainer.setGeometry(QtCore.QRect(70, 30, 331, 201))
+        self.formContainer.setStyleSheet("QFrame {\n"
+"    border: 0;\n"
+"}")
         self.formContainer.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.formContainer.setFrameShadow(QtWidgets.QFrame.Raised)
         self.formContainer.setObjectName("formContainer")
@@ -72,13 +75,8 @@ class Ui_MainWindow(object):
         self.connectError.setStyleSheet("QLabel { color : red; }")
         self.connectError.setAlignment(QtCore.Qt.AlignCenter)
         self.connectError.setObjectName("connectError")
-        self.connectSuccess.raise_()
-        self.connectSuccess.raise_()
-        self.loginForm.raise_()
-        self.connectError.raise_()
         self.formContainer.raise_()
         self.loadingSpinner.raise_()
-        self.loginForm.raise_()
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
         self.menuBar.setEnabled(True)
