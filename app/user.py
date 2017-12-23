@@ -4,9 +4,7 @@ import logging
 from lxml import etree
 import json
 
-from PyQt5.QtCore import QObject, pyqtSignal, QUrl, QThread
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
-from PyQt5.QtGui import QIcon, QImage, QPixmap
+from PyQt5.QtCore import QObject, pyqtSignal, QThread
 
 from config import config
 from decorators import autoCreateDir
