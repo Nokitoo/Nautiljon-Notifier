@@ -10,6 +10,22 @@ cache: pip
 install:
   - pip install -r requirements.txt
 script:
+  - echo "Building app"
   - rm -rf build dist
   - python -O -m PyInstaller scripts/build.spec
-  - ls dist
+  - echo "Creating .dmg file from build"
+  - mkdir dist/build
+  - DMG_FILE_PATH="`pwd`/dist/build/nautiljon_notifier.dmg"
+  - rm -f "$DMG_FILE_PATH"
+  - hdiutil create -srcfolder dist/nautiljon_notifier.app "$DMG_FILE_PATH"
+  - echo "Build done"
+
+deploy:
+  provider: s3
+  access_key_id: "$ARTIFACTS_KEY"
+  secret_access_key: "$ARTIFACTS_SECRET"
+  bucket: "$ARTIFACTS_BUCKET"
+  region: "$ARTIFACTS_REGION"
+  skip_cleanup: true
+  upload-dir: mac-osx-build
+  local_dir: "dist/build"
