@@ -1,4 +1,5 @@
 import sys
+import os
 
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtGui import QIntValidator
@@ -17,6 +18,10 @@ class PreferencesDialog(QDialog, Ui_Dialog):
         self.notificationsCloseSeconds.setText(str(self.user.settings.notificationsCloseSeconds))
 
         self.notificationsCloseSeconds.setValidator(QIntValidator(0, 100, self));
+
+        # Hide "start at boot" option if not on windows
+        if os.name != 'nt':
+            self.startAtBootCheckbox.hide()
 
     def onSavePreferences(self):
         self.close()
