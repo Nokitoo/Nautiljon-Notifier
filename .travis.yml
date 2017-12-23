@@ -1,0 +1,15 @@
+os: osx
+language: generic
+env: PYTHON=3.5.1
+before_install:
+  - brew update
+  - brew install python3
+  - virtualenv env -p python3
+  - source env/bin/activate
+cache: pip
+install:
+  - pip install -r requirements.txt
+script:
+  - rm -rf build dist
+  - python -O -m PyInstaller scripts/build.spec
+  - ls dist

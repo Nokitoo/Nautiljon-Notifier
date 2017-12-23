@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 
-from PyInstaller.compat import is_linux
+from PyInstaller.compat import is_linux, is_darwin
 
 block_cipher = None
 
@@ -60,3 +60,8 @@ else:
                  strip=False,
                  upx=True,
                  name='app')
+  if is_darwin:
+    app = BUNDLE(coll,
+         name='nautiljon_notifier.app',
+         icon='app/assets/nautiljon_icon.ico',
+         bundle_identifier=None)
