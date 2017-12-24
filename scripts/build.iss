@@ -19,8 +19,8 @@ UninstallDisplayName={#MyAppName}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
 OutputBaseFilename=NautiljonNotifierSetup
-SetupIconFile=C:\Users\Nokito\Documents\Nautiljon Notifier PythonQT\app\assets\nautiljon_icon.ico
-UninstallDisplayIcon=C:\Users\Nokito\Documents\Nautiljon Notifier PythonQT\app\assets\nautiljon_icon.ico
+SetupIconFile={#SourcePath}\..\app\assets\nautiljon_icon.ico
+UninstallDisplayIcon={#SourcePath}\..\app\assets\nautiljon_icon.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -31,7 +31,7 @@ Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}";
 
 [Files]
-Source: "C:\Users\Nokito\Documents\Nautiljon Notifier PythonQT\dist\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "{#SourcePath}\..\dist\app\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
