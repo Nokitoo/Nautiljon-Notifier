@@ -4,7 +4,7 @@
 #define MyAppName "Nautiljon Notifier"
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Nokitoo"
-#define MyAppExeName "Nautiljon Notifier.exe"
+#define MyAppExeName "nautiljon_notifier.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
