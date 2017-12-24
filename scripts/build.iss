@@ -20,7 +20,7 @@ DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
 OutputBaseFilename=nautiljon_notifier_win64
 SetupIconFile={#SourcePath}\..\app\assets\nautiljon_icon.ico
-UninstallDisplayIcon={#SourcePath}\..\app\assets\nautiljon_icon.ico
+UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma
 SolidCompression=yes
 
