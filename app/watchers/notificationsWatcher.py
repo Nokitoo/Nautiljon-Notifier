@@ -16,22 +16,12 @@ class NotificationsWatcher(Watcher):
         message = item.xpath('string(.//*[contains(@class, "uneNotificationMessage")])')
         iconUrl = getResourceUrl(item.xpath('string(.//*[contains(@class, "uneNotificationLien")]/img/@src)'))
         href = item.xpath('string(.//a[contains(@class, "uneNotificationLien")]/@href)')
-        onClick = item.xpath('string(.//a[contains(@class, "uneNotificationLien")]/@onclick)')
         notificationId = getUrlParam(href, 'read');
-
-        url = re.findall(r"'[^']+'", str(onClick))[-1]
-
-        def onClickHandler():
-            try:
-                self.user.session.get(getResourceUrl(href))
-            except Exception as e:
-                logging.exception('Cannot read notification %s', notificationId)
 
         return {
             'itemId': notificationId,
-            'url': getResourceUrl(url.replace('\'', '')),
+            'url': getResourceUrl(href),
             'title': title,
             'message': message,
-            'iconUrl': iconUrl,
-            'onClick': onClickHandler
+            'iconUrl': iconUrl
         }

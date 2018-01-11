@@ -52,8 +52,6 @@ class Notification(QDialog, NotificationDialog):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton and not self.closeNotification.underMouse():
             webbrowser.open_new_tab(self.url)
-            if self.onClick:
-                self.onClick()
             self.destroyNotification()
 
     def onNotificationDestroyed(self):
